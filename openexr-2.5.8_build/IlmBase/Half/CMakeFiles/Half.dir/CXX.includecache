@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/eLut.h
+
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/half.cpp
+assert.h
+-
+half.h
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/half.h
+toFloat.h
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/toFloat.h
+eLut.h
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/eLut.h
+
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/half.h
+halfExport.h
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/halfExport.h
+iostream
+-
+
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/halfExport.h
+
+/home/aahartl/6040/openexr-2.5.8/IlmBase/Half/toFloat.h
+
