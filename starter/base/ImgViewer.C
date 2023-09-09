@@ -1,13 +1,14 @@
-
 #include <vector>
 #include <string>
-#include "StarterViewer.h"
 #include <iostream>
 
 #include <OpenImageIO/imageio.h>
 using namespace OIIO;
 
+#include "StarterViewer.h"
 using namespace starter;
+
+#include "ImgProc.h"
 
 
 void read_image(){
