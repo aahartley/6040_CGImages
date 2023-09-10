@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 
+
 #include <OpenImageIO/imageio.h>
 using namespace OIIO;
 
@@ -11,8 +12,10 @@ using namespace starter;
 #include "ImgProc.h"
 
 
+
 void read_image(){
 	std::string filename = "dummy.jpg";
+	int a=5;
 	std::cout << "\n\n\n" << filename << std::endl;
 	auto inp = ImageInput::open(filename);
 	if (! inp)
@@ -26,11 +29,17 @@ void read_image(){
 	inp->close();
 }
 
+void test(){
+	std::cout << "hi\n";
+}
+
 int main( int argc, char** argv )
 {
    
     read_image();
-    StarterViewer* viewer = CreateViewer();
+	test();
+
+	StarterViewer* viewer = CreateViewer();
 
     std::vector<std::string> args;
 
