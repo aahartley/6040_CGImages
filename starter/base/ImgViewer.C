@@ -31,7 +31,7 @@ int main( int argc, char** argv )
    
     read_image();
     StarterViewer* viewer = CreateViewer();
-
+	int a =5;
     std::vector<std::string> args;
 
     for(int i=0;i<argc;i++)
