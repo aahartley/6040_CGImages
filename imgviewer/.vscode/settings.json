@@ -4,6 +4,11 @@
             "cwd": "/home/aahartl/6040/starter/bin",
             "binaryPath": "/home/aahartl/6040/starter/bin/imgviewer",
             "binaryArgs": []
+        },
+        {
+            "cwd": "/home/aahartl/6040/imgviewer/bin",
+            "binaryPath": "/home/aahartl/6040/imgviewer/bin/imgviewer",
+            "binaryArgs": []
         }
     ],
     "files.associations": {
