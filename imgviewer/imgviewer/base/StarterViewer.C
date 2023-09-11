@@ -13,7 +13,9 @@
 //--------------------------------------------------------
 
 
-
+#include <GL/gl.h>   // OpenGL itself.
+#include <GL/glu.h>  // GLU support library.
+#include <GL/glut.h> // GLUT support library.
 
 
 
@@ -27,7 +29,6 @@
 
 
 using namespace std;
-using namespace img;
 namespace starter{
 
 
@@ -144,23 +145,15 @@ void StarterViewer::MainLoop()
 void StarterViewer::Display()
 {
    ++frame;
-   if(imgProc.depth() == 3)
-   {
-      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGB, GL_FLOAT, imgProc.raw() );
-   }
-   else
-   {
-      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGBA,GL_FLOAT, imgProc.raw() );
-   }
-   // glLoadIdentity();
-   // gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );
-   // gluLookAt( camera_eye_x, camera_eye_y, camera_eye_z,    // Camera eye point
-   //             camera_view_x, camera_view_y, camera_view_z, // Camera view point
-   //             camera_up_x, camera_up_y, camera_up_z        // Camera up direction
-   //           );
+   glLoadIdentity();
+   gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );
+   gluLookAt( camera_eye_x, camera_eye_y, camera_eye_z,    // Camera eye point
+               camera_view_x, camera_view_y, camera_view_z, // Camera view point
+               camera_up_x, camera_up_y, camera_up_z        // Camera up direction
+             );
 
-   // glEnable(GL_DEPTH_TEST);
-   // glDepthRange( camera_near, camera_far );
+   glEnable(GL_DEPTH_TEST);
+   glDepthRange( camera_near, camera_far );
 }
 
 
@@ -171,9 +164,9 @@ void StarterViewer::Reshape( int w, int h )
    height = h;
    camera_aspect = (float)width/(float)height;
 
-   // glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
-   // glMatrixMode( GL_PROJECTION );
-   // glLoadIdentity();
+   glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
+   glMatrixMode( GL_PROJECTION );
+   glLoadIdentity();
 }
 
 void StarterViewer::Keyboard( unsigned char key, int x, int y )
@@ -214,7 +207,7 @@ void StarterViewer::Motion( int x, int y )
    float dy = y - mouse_y;
    float pos_x = current_raster_pos[0] + dx;
    float pos_y = current_raster_pos[1] - dy;
-   //glRasterPos2f( pos_x, pos_y ); 
+   glRasterPos2f( pos_x, pos_y ); 
 
    // camera motion perp to view direction
    if(keystate == GLUT_ACTIVE_SHIFT )

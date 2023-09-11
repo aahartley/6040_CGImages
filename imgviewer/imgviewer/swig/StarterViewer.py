@@ -264,12 +264,6 @@ class StarterViewer(object):
     def GetTitle(self):
         return _StarterViewer.StarterViewer_GetTitle(self)
 
-<<<<<<< HEAD
-    def SetImage(self, img):
-        return _StarterViewer.StarterViewer_SetImage(self, img)
-
-=======
->>>>>>> main
     def Display(self):
         return _StarterViewer.StarterViewer_Display(self)
 

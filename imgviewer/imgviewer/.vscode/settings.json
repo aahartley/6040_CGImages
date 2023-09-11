@@ -1,0 +1,14 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/aahartl/6040/starter/bin",
+            "binaryPath": "/home/aahartl/6040/starter/bin/imgviewer",
+            "binaryArgs": []
+        }
+    ],
+    "files.associations": {
+        "ImgViewer.C": "cpp",
+        "ImgProc.C": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

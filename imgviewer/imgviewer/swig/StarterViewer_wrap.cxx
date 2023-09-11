@@ -2663,19 +2663,6 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_allocator_type swig_types[0]
 #define SWIGTYPE_p_char swig_types[1]
 #define SWIGTYPE_p_difference_type swig_types[2]
-<<<<<<< HEAD
-#define SWIGTYPE_p_img__ImgProc swig_types[3]
-#define SWIGTYPE_p_p_PyObject swig_types[4]
-#define SWIGTYPE_p_size_type swig_types[5]
-#define SWIGTYPE_p_starter__StarterViewer swig_types[6]
-#define SWIGTYPE_p_std__allocatorT_std__string_t swig_types[7]
-#define SWIGTYPE_p_std__invalid_argument swig_types[8]
-#define SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t swig_types[9]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[10]
-#define SWIGTYPE_p_value_type swig_types[11]
-static swig_type_info *swig_types[13];
-static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
-=======
 #define SWIGTYPE_p_p_PyObject swig_types[3]
 #define SWIGTYPE_p_size_type swig_types[4]
 #define SWIGTYPE_p_starter__StarterViewer swig_types[5]
@@ -2686,7 +2673,6 @@ static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
 #define SWIGTYPE_p_value_type swig_types[10]
 static swig_type_info *swig_types[12];
 static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
->>>>>>> main
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7967,41 +7953,6 @@ fail:
 }
 
 
-<<<<<<< HEAD
-SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  img::ImgProc *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetImage", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_SetImage" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
-  }
-  arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_img__ImgProc,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
-  }
-  arg2 = reinterpret_cast< img::ImgProc * >(argp2);
-  (arg1)->SetImage((img::ImgProc const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-=======
->>>>>>> main
 SWIGINTERN PyObject *_wrap_StarterViewer_Display(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
@@ -8530,10 +8481,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "StarterViewer_GetHeight", _wrap_StarterViewer_GetHeight, METH_O, NULL},
 	 { "StarterViewer_SetTitle", _wrap_StarterViewer_SetTitle, METH_VARARGS, NULL},
 	 { "StarterViewer_GetTitle", _wrap_StarterViewer_GetTitle, METH_O, NULL},
-<<<<<<< HEAD
-	 { "StarterViewer_SetImage", _wrap_StarterViewer_SetImage, METH_VARARGS, NULL},
-=======
->>>>>>> main
 	 { "StarterViewer_Display", _wrap_StarterViewer_Display, METH_O, NULL},
 	 { "StarterViewer_Keyboard", _wrap_StarterViewer_Keyboard, METH_VARARGS, NULL},
 	 { "StarterViewer_Mouse", _wrap_StarterViewer_Mouse, METH_VARARGS, NULL},
@@ -8561,10 +8508,6 @@ static PyMethodDef SwigMethods_proxydocs[] = {
 static swig_type_info _swigt__p_allocator_type = {"_p_allocator_type", "allocator_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_difference_type = {"_p_difference_type", "difference_type *", 0, 0, (void*)0, 0};
-<<<<<<< HEAD
-static swig_type_info _swigt__p_img__ImgProc = {"_p_img__ImgProc", "img::ImgProc *", 0, 0, (void*)0, 0};
-=======
->>>>>>> main
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_starter__StarterViewer = {"_p_starter__StarterViewer", "starter::StarterViewer *", 0, 0, (void*)0, 0};
@@ -8578,10 +8521,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_allocator_type,
   &_swigt__p_char,
   &_swigt__p_difference_type,
-<<<<<<< HEAD
-  &_swigt__p_img__ImgProc,
-=======
->>>>>>> main
   &_swigt__p_p_PyObject,
   &_swigt__p_size_type,
   &_swigt__p_starter__StarterViewer,
@@ -8595,10 +8534,6 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_allocator_type[] = {  {&_swigt__p_allocator_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_difference_type[] = {  {&_swigt__p_difference_type, 0, 0, 0},{0, 0, 0, 0}};
-<<<<<<< HEAD
-static swig_cast_info _swigc__p_img__ImgProc[] = {  {&_swigt__p_img__ImgProc, 0, 0, 0},{0, 0, 0, 0}};
-=======
->>>>>>> main
 static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_starter__StarterViewer[] = {  {&_swigt__p_starter__StarterViewer, 0, 0, 0},{0, 0, 0, 0}};
@@ -8612,10 +8547,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_allocator_type,
   _swigc__p_char,
   _swigc__p_difference_type,
-<<<<<<< HEAD
-  _swigc__p_img__ImgProc,
-=======
->>>>>>> main
   _swigc__p_p_PyObject,
   _swigc__p_size_type,
   _swigc__p_starter__StarterViewer,

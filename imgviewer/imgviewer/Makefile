@@ -5,7 +5,6 @@ OFILES = \
          base/LinearAlgebra.o \
 	 	 base/StarterViewer.o \
 		 base/ImgProc.o \
-		 base/ImgViewer.o
 		  
 
 
@@ -39,7 +38,7 @@ base: $(OFILES)
 	$(SWIGLD) swig/StarterViewer_wrap.o  $(SWIGLIB) -ldl -L./lib -lstarter $(GLLDFLAGS)  -o swig/_StarterViewer.so
 	cp swig/StarterViewer.py python/
 	cp swig/_StarterViewer.so python/
-	$(CXX) base/Main.C $(INCLUDES)  -L./lib -lstarter $(GLLDFLAGS)  -L ../build/lib -lOpenImageIO -o bin/imgviewer
+	$(CXX) base/ImgViewer.C $(INCLUDES)  -L./lib -lstarter $(GLLDFLAGS)  -L ../build/lib -lOpenImageIO -o bin/imgviewer
 
 clean:
 	rm -rf bin/simple_viewer doc/html *.o base/*.o base/*~ include/*~ python/*~ $(LIB)  *~ swig/*.cxx swig/*~ swig/*.so swig/*.o swig/StarterViewer.py swig/*.pyc ./*.pyc python/*StarterViewer*
