@@ -144,13 +144,13 @@ void StarterViewer::MainLoop()
 void StarterViewer::Display()
 {
    ++frame;
-   if(imgProc->depth() == 3)
+   if(imgProc.depth() == 3)
    {
-      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
+      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGB, GL_FLOAT, imgProc.raw() );
    }
    else
    {
-      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGBA,GL_FLOAT, imgProc->raw() );
+      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGBA,GL_FLOAT, imgProc.raw() );
    }
    // glLoadIdentity();
    // gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );

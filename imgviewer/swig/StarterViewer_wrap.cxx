@@ -7957,7 +7957,7 @@ fail:
 SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  img::ImgProc *arg2 = (img::ImgProc *) 0 ;
+  img::ImgProc *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -7970,12 +7970,15 @@ SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_SetImage" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
   }
   arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_img__ImgProc, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_img__ImgProc,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
   }
   arg2 = reinterpret_cast< img::ImgProc * >(argp2);
-  (arg1)->SetImage(arg2);
+  (arg1)->SetImage((img::ImgProc const &)*arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8426,58 +8429,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_StarterViewer_imgProc_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  img::ImgProc *arg2 = (img::ImgProc *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_imgProc_set", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_imgProc_set" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
-  }
-  arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_img__ImgProc, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "StarterViewer_imgProc_set" "', argument " "2"" of type '" "img::ImgProc *""'"); 
-  }
-  arg2 = reinterpret_cast< img::ImgProc * >(argp2);
-  if (arg1) (arg1)->imgProc = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_StarterViewer_imgProc_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  img::ImgProc *result = 0 ;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_imgProc_get" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
-  }
-  arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  result = (img::ImgProc *) ((arg1)->imgProc);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_img__ImgProc, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *StarterViewer_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
@@ -8576,8 +8527,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "StarterViewer_GetFrame", _wrap_StarterViewer_GetFrame, METH_O, NULL},
 	 { "StarterViewer_Usage", _wrap_StarterViewer_Usage, METH_O, NULL},
 	 { "StarterViewer_SetCameraEyeViewUp", _wrap_StarterViewer_SetCameraEyeViewUp, METH_VARARGS, NULL},
-	 { "StarterViewer_imgProc_set", _wrap_StarterViewer_imgProc_set, METH_VARARGS, NULL},
-	 { "StarterViewer_imgProc_get", _wrap_StarterViewer_imgProc_get, METH_O, NULL},
 	 { "StarterViewer_swigregister", StarterViewer_swigregister, METH_O, NULL},
 	 { "CreateViewer", _wrap_CreateViewer, METH_NOARGS, NULL},
 	 { NULL, NULL, 0, NULL }

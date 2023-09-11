@@ -13,18 +13,17 @@ void ImgViewer::run(const int argc, char const* const* argv){
        std::string s(argv[i]);
        args.push_back(s);
     }
-	for(unsigned int i=1; i<args.size();i++)
-	{
-		std::string s = args[i];
-		if(s=="-image")
+	if(args.size()>1){
+		for(unsigned int i=1; i<args.size();i++)
 		{
-			read_image(args[i+1]);
+			std::string s = args[i];
+			if(s=="-image")
+			{
+				read_image(args[i+1]);
+				viewer->SetImage(imgProc);
+
+			}
 		}
-	}
-	//std::cout << index(2,2,2,3,3) <<'\n';
-	viewer->SetImage(imgProc);
-	if(imgProc == viewer->imgProc){
-		std::cout <<"we good\n";
 	}
     viewer->Init(args);
     viewer->MainLoop();
@@ -44,59 +43,43 @@ void ImgViewer::read_image(const std::string& s){
 	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * nchannels]);
 	inp->read_image(0, 0, 0, nchannels, TypeDesc::UINT8, &pixels[0]);
 	inp->close();
-	imgProc->clear(xres,yres,nchannels);
-	std::vector<char> pixel(xres*yres*nchannels);
+	imgProc.clear(xres,yres,nchannels);
+	std::vector<uint8_t> pixel(xres*yres*nchannels);
 	for(int i=xres*yres*nchannels-1; i>=0;i--){
+		//flip image horizontally
 		pixel[i]=pixels[(xres*yres*nchannels-1)-i];
 	}
-
 	//std::reverse(pixel.begin(),pixel.end());
-	//col to width
+	//row to width
 	for(int i=0; i<xres;i++)
 	{
-		//rows to height
+		//col to height
 		for(int j=0; j<yres;j++)
 		{
 			std::vector<float> p(nchannels);
 
 			if(nchannels==3)
 			{
-				int index = ((xres-1)-i + j*xres)*nchannels;
-				p[0]=(float)pixel[index-2];
-				p[1]=(float)pixel[index-1];
-				p[2]=(float)pixel[index];
+				//flip image vertically
+				int index = ((xres-1)-i + j*xres)*nchannels; //starts at B
+				p[2]=(float)pixel[index]*(1.0f/(float)0xFF); //optimize by shifting, pre-compiled lookuptable?
+				p[1]=(float)pixel[index+1]*(1.0f/(float)0xFF);
+				p[0]=(float)pixel[index+2]*(1.0f/(float)0xFF);
 			}
 			else if(nchannels==4)
 			{
-				int index = ((xres-1)-i + j*xres)*nchannels;
-				p[0]=(float)pixel[index+1];
-				p[1]=(float)pixel[index+2];
-				p[2]=(float)pixel[index+3];
-				p[3]=(float)pixel[index];
+				//flip image vertically
+				int index = ((xres-1)-i + j*xres)*nchannels; //starts at B
+				p[3]=float(pixel[index])*(1.0f/(float)0xFF);
+				p[2]=float(pixel[index+1])*(1.0f/(float)0xFF);
+				p[1]=float(pixel[index+2])*(1.0f/(float)0xFF);
+				p[0]=float(pixel[index+3])*(1.0f/(float)0xFF);
 			}
-
-
-			imgProc->set_value(i,j,p);
-			//std::cout<< j*yres+i << '\n';
+			imgProc.set_value(i,j,p);
 
 		}
 	}
-	// int index=0;
-	// int count=1;
-	// for(int i=0; i<xres;i++)
-	// {
-		
-	// 	int cols = yres*nchannels-1;
-	// 	//std::reverse( p.begin() +index, p.end() - ((p.size()-1) +cols*count+i) );
-	// 	count++;
-	// 	index +=cols+1;
-	// }
-	//std::cout << xres*yres*nchannels << '\n';
-	//for(int i=0; i<xres*yres*nchannels;i++)
-	// {
-		//imgProc.raw()[i] = p[i];
-	//}
-	//imgProc.setRaw(&p[0]);
+	
 
 }
 
