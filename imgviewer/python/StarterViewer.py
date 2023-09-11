@@ -302,6 +302,7 @@ class StarterViewer(object):
 
     def SetCameraEyeViewUp(self, eyex, eyey, eyez, viewx, viewy, viewz, upx, upy, upz):
         return _StarterViewer.StarterViewer_SetCameraEyeViewUp(self, eyex, eyey, eyez, viewx, viewy, viewz, upx, upy, upz)
+    imgProc = property(_StarterViewer.StarterViewer_imgProc_get, _StarterViewer.StarterViewer_imgProc_set)
 
 # Register StarterViewer in _StarterViewer:
 _StarterViewer.StarterViewer_swigregister(StarterViewer)

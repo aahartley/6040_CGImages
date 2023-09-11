@@ -22,7 +22,11 @@
         "random": "cpp",
         "deque": "cpp",
         "string": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "array": "cpp",
+        "unordered_map": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

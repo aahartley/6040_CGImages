@@ -69,7 +69,7 @@ class StarterViewer
     const std::string& GetTitle() { return title; }
 
     //! Set the Image
-    void SetImage(const img::ImgProc& img) {imgProc = img;}
+    void SetImage(img::ImgProc* img) {imgProc = img;}
 
     // Callback functions
     //! Cascading callback for initiating a display event
@@ -99,6 +99,7 @@ class StarterViewer
 
     //! Set the camera for 3D viewing.
     void SetCameraEyeViewUp( float eyex, float eyey, float eyez, float viewx, float viewy, float viewz, float upx, float upy, float upz ); 
+    img::ImgProc* imgProc = nullptr;
 
   private:
 
@@ -112,7 +113,6 @@ class StarterViewer
     int mouse_state;
     float current_raster_pos[4];
 
-    img::ImgProc imgProc;
 
    
     float camera_fov;

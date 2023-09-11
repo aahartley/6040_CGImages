@@ -144,13 +144,13 @@ void StarterViewer::MainLoop()
 void StarterViewer::Display()
 {
    ++frame;
-   if(imgProc.depth() == 3)
+   if(imgProc->depth() == 3)
    {
-      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGB, GL_FLOAT, imgProc.raw() );
+      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
    }
    else
    {
-      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGBA,GL_FLOAT, imgProc.raw() );
+      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGBA,GL_FLOAT, imgProc->raw() );
    }
    // glLoadIdentity();
    // gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );
@@ -171,9 +171,9 @@ void StarterViewer::Reshape( int w, int h )
    height = h;
    camera_aspect = (float)width/(float)height;
 
-   glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
+   // glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
+   // glMatrixMode( GL_PROJECTION );
+   // glLoadIdentity();
 }
 
 void StarterViewer::Keyboard( unsigned char key, int x, int y )
@@ -214,7 +214,7 @@ void StarterViewer::Motion( int x, int y )
    float dy = y - mouse_y;
    float pos_x = current_raster_pos[0] + dx;
    float pos_y = current_raster_pos[1] - dy;
-   glRasterPos2f( pos_x, pos_y ); 
+   //glRasterPos2f( pos_x, pos_y ); 
 
    // camera motion perp to view direction
    if(keystate == GLUT_ACTIVE_SHIFT )

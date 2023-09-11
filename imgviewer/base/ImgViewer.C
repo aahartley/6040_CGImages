@@ -23,6 +23,9 @@ void ImgViewer::run(const int argc, char const* const* argv){
 	}
 	//std::cout << index(2,2,2,3,3) <<'\n';
 	viewer->SetImage(imgProc);
+	if(imgProc == viewer->imgProc){
+		std::cout <<"we good\n";
+	}
     viewer->Init(args);
     viewer->MainLoop();
 }
@@ -41,26 +44,39 @@ void ImgViewer::read_image(const std::string& s){
 	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * nchannels]);
 	inp->read_image(0, 0, 0, nchannels, TypeDesc::UINT8, &pixels[0]);
 	inp->close();
-	imgProc.clear(xres,yres,nchannels);
-	// std::vector<float> p(xres*yres*nchannels);
-	// for(int i=0; i<xres*yres*nchannels;i++)
-	// {
-	// 	p[i]= (float)pixels[i];
-	// }
+	imgProc->clear(xres,yres,nchannels);
+	std::vector<char> pixel(xres*yres*nchannels);
+	for(int i=xres*yres*nchannels-1; i>=0;i--){
+		pixel[i]=pixels[(xres*yres*nchannels-1)-i];
+	}
+
+	//std::reverse(pixel.begin(),pixel.end());
 	//col to width
-	for(int j=0; j<xres;j++)
+	for(int i=0; i<xres;i++)
 	{
 		//rows to height
-		for(int i=0; i<yres;i++)
+		for(int j=0; j<yres;j++)
 		{
-			std::vector<float> p(4);
-			p[0]=(float)pixels[j*xres+i];
-			p[1]=(float)pixels[j*xres+i+1];
-			p[2]=(float)pixels[j*xres+i+2];
-			p[3]=(float)pixels[j*xres+i+3];
+			std::vector<float> p(nchannels);
+
+			if(nchannels==3)
+			{
+				int index = ((xres-1)-i + j*xres)*nchannels;
+				p[0]=(float)pixel[index-2];
+				p[1]=(float)pixel[index-1];
+				p[2]=(float)pixel[index];
+			}
+			else if(nchannels==4)
+			{
+				int index = ((xres-1)-i + j*xres)*nchannels;
+				p[0]=(float)pixel[index+1];
+				p[1]=(float)pixel[index+2];
+				p[2]=(float)pixel[index+3];
+				p[3]=(float)pixel[index];
+			}
 
 
-			imgProc.set_value(i,j,p);
+			imgProc->set_value(i,j,p);
 			//std::cout<< j*yres+i << '\n';
 
 		}
