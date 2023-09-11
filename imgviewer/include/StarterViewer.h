@@ -20,6 +20,10 @@
 
 #include <string>
 #include <vector>
+#include <GL/gl.h>   // OpenGL itself.
+#include <GL/glu.h>  // GLU support library.
+#include <GL/glut.h> // GLUT support library.
+#include "ImgProc.h"
 
 using namespace std;
 
@@ -64,6 +68,9 @@ class StarterViewer
     //! Get the window title
     const std::string& GetTitle() { return title; }
 
+    //! Set the Image
+    void SetImage(const img::ImgProc& img) {imgProc = img;}
+
     // Callback functions
     //! Cascading callback for initiating a display event
     void Display();
@@ -104,6 +111,9 @@ class StarterViewer
     int keystate, button;
     int mouse_state;
     float current_raster_pos[4];
+
+    img::ImgProc imgProc;
+
    
     float camera_fov;
     float camera_aspect;

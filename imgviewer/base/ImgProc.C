@@ -26,9 +26,40 @@ void ImgProc::clear(int nX, int nY, int nC)
 	Nc = nC;
 	Nsize = (long)Nx * (long)Ny * (long)Nc;
 	img_data = new float[Nsize];
-
+	
 	#pragma omp parallel for
 	for(long i=0; i<Nsize; i++) { img_data[i] = 0.0; }
+}
+
+void ImgProc::value( int i, int j, std::vector<float>& pixel) const
+{
+	pixel.clear();
+	if( img_data == nullptr ){ return; }
+	if( i<0 || i>=Nx ){ return; }
+	if( j<0 || j>=Ny ){ return; }
+	pixel.resize(Nc);
+	for( int c=0;c<Nc;c++ )
+	{
+		pixel[c] = img_data[index(i,j,c,Nc,Nx)];
+	}
+	return;
+}
+
+void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
+{
+	if( img_data == nullptr ){ return; }
+	if( i<0 || i>=Nx ){ return; }
+	if( j<0 || j>=Ny ){ return; }
+	if( Nc > (int)pixel.size() ){ return; }
+	//#pragma omp parallel for
+	for( int c=0;c<Nc;c++ )
+	{
+		//std::cout << index(i,j,c,Nc,Nx) << '\n';
+		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
+		//std::cout << img_data[index(i,j,c,Nc,Nx)] << '\n';
+
+	}
+	return;
 }
 
 ImgProc::ImgProc(const ImgProc& v) :

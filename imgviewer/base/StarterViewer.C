@@ -13,9 +13,7 @@
 //--------------------------------------------------------
 
 
-#include <GL/gl.h>   // OpenGL itself.
-#include <GL/glu.h>  // GLU support library.
-#include <GL/glut.h> // GLUT support library.
+
 
 
 
@@ -29,6 +27,7 @@
 
 
 using namespace std;
+using namespace img;
 namespace starter{
 
 
@@ -145,15 +144,23 @@ void StarterViewer::MainLoop()
 void StarterViewer::Display()
 {
    ++frame;
-   glLoadIdentity();
-   gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );
-   gluLookAt( camera_eye_x, camera_eye_y, camera_eye_z,    // Camera eye point
-               camera_view_x, camera_view_y, camera_view_z, // Camera view point
-               camera_up_x, camera_up_y, camera_up_z        // Camera up direction
-             );
+   if(imgProc.depth() == 3)
+   {
+      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGB, GL_FLOAT, imgProc.raw() );
+   }
+   else
+   {
+      glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGBA,GL_FLOAT, imgProc.raw() );
+   }
+   // glLoadIdentity();
+   // gluPerspective( camera_fov, camera_aspect, camera_near, camera_far );
+   // gluLookAt( camera_eye_x, camera_eye_y, camera_eye_z,    // Camera eye point
+   //             camera_view_x, camera_view_y, camera_view_z, // Camera view point
+   //             camera_up_x, camera_up_y, camera_up_z        // Camera up direction
+   //           );
 
-   glEnable(GL_DEPTH_TEST);
-   glDepthRange( camera_near, camera_far );
+   // glEnable(GL_DEPTH_TEST);
+   // glDepthRange( camera_near, camera_far );
 }
 
 

@@ -1,14 +1,11 @@
 {
     "makefile.launchConfigurations": [
         {
-            "cwd": "/home/aahartl/6040/${workspaceFolder}/bin",
-            "binaryPath": "/home/aahartl/6040/${workspaceFolder}/bin/imgviewer",
-            "binaryArgs": []
-        },
-        {
-            "cwd": "/home/aahartl/6040/starter/bin",
-            "binaryPath": "/home/aahartl/6040/starter/bin/imgviewer",
-            "binaryArgs": []
+            "cwd": "/home/aahartl/6040/imgviewer/bin",
+            "binaryPath": "/home/aahartl/6040/imgviewer/bin/imgviewer",
+            "binaryArgs": [
+                "-image ~/Pictures/tiger4.png"
+            ]
         },
         {
             "cwd": "/home/aahartl/6040/imgviewer/bin",
@@ -18,7 +15,14 @@
     ],
     "files.associations": {
         "ImgViewer.C": "cpp",
-        "ImgProc.C": "cpp"
+        "ImgProc.C": "cpp",
+        "Main.C": "cpp",
+        "StarterViewer.C": "cpp",
+        "vector": "cpp",
+        "random": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "future": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
