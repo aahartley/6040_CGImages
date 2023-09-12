@@ -15,7 +15,7 @@ class ImgViewer{
   public:
     ImgViewer(){};
     ~ImgViewer(){};
-    
+
     void run(const int argc, char const* const* argv);
   private:
     img::ImgProc imgProc;

@@ -13,6 +13,9 @@
 //--------------------------------------------------------
 #include "StarterViewer.h"
 
+#include <GL/gl.h>   // OpenGL itself.
+#include <GL/glu.h>  // GLU support library.
+#include <GL/glut.h> // GLUT support library.
 using namespace std;
 using namespace img;
 
@@ -147,7 +150,7 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
          break;
       case 'h':
 	      Home();
-      break;
+         break;
       case 'u':
 	      Usage();
          break;

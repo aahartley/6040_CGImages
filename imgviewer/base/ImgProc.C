@@ -52,7 +52,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	if( i<0 || i>=Nx ){ return; }
 	if( j<0 || j>=Ny ){ return; }
 	if( Nc > (int)pixel.size() ){ return; }
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for( int c=0;c<Nc;c++ )
 	{
 		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
@@ -118,28 +118,46 @@ void ImgProc::read_image(const std::string& s)
 
 		}
 	}
+	write_image();
 }
+
 
 void ImgProc::write_image()
 {
-	read_image("/home/aahartl/Pictures/sky.jpeg");
-	const char *filename = "demowritetoafile.jpg";
-	const int xres = Nx, yres = Ny;
-	int channels = 3;  // RGB
-	unsigned char pixels[xres * yres * channels];
-	for(int i=xres*yres*channels-1; i>=0;i--)
+	auto inp = ImageInput::open(fn);
+	if (! inp)
 	{
-		pixels[i]=(uint8_t)img_data[i];
-	}
-	 std::unique_ptr<ImageOutput> out = ImageOutput::create (filename);
-	if (! out)
-	{
-		std::cout << "We out \n";
+		//std::cout << "Couldn't find " << filename << std::endl;
     	return;
 	}
-	ImageSpec* spec =new ImageSpec(xres,yres,channels,TypeDesc::UINT8);
-    out->open (filename, *spec);
-	out->write_image (TypeDesc::UINT8, pixels);
+	const ImageSpec &spec = inp->spec();
+	int xres = spec.width;
+	int yres = spec.height;
+	int nchannels = spec.nchannels;
+	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * nchannels]);
+	inp->read_image(0, 0, 0, nchannels, TypeDesc::UINT8, &pixels[0]);
+	inp->close();
+
+
+	const char *filename = "/home/aahartl/Pictures/skydemo.jpeg";
+	//const int xres = Nx, yres = Ny;
+	std::cout << Nx <<'\n';
+	const int channels = 3;  // RGB
+	unsigned char* pixel= new unsigned char[xres * yres * channels];
+	for(int i=0; i<xres*yres*channels; i++)
+	{
+		pixel[i]= pixels[i];
+	}
+
+	std::unique_ptr<ImageOutput> out = ImageOutput::create (filename);
+	if (! out)
+	{
+		std::cout<< "error\n";
+    	return;
+	}
+	///ImageSpec spec1(xres, yres, channels, TypeDesc::UINT8);
+	out->open (filename, spec);
+	out->write_image (TypeDesc::UINT8, &pixels[0]);
 	out->close ();
 }
 

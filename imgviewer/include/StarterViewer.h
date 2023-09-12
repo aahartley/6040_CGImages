@@ -25,9 +25,6 @@
 #include <cmath>
 #include <cstring>
 
-#include <GL/gl.h>   // OpenGL itself.
-#include <GL/glu.h>  // GLU support library.
-#include <GL/glut.h> // GLUT support library.
 
 #include "ImgProc.h"
 
