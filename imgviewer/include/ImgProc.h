@@ -42,6 +42,7 @@ class ImgProc
 	int Nx, Ny, Nc;
 	long Nsize;
 	float* img_data;
+	std::string fn;
 };
 }
 #endif

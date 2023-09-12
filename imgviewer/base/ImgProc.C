@@ -64,6 +64,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 void ImgProc::read_image(const std::string& s)
 {
 	std::string filename = s;
+	fn=filename;
 	std::cout << "\nAttempting to find: " << filename << std::endl;
 	auto inp = ImageInput::open(filename);
 	if (! inp)
@@ -121,6 +122,7 @@ void ImgProc::read_image(const std::string& s)
 
 void ImgProc::write_image()
 {
+	read_image("/home/aahartl/Pictures/sky.jpeg");
 	const char *filename = "demowritetoafile.jpg";
 	const int xres = Nx, yres = Ny;
 	int channels = 3;  // RGB
@@ -135,10 +137,10 @@ void ImgProc::write_image()
 		std::cout << "We out \n";
     	return;
 	}
-	ImageSpec spec(xres, yres, channels, TypeDesc::UINT8);
-    // out->open (filename, spec);
-	// out->write_image (TypeDesc::UINT8, pixels);
-	// out->close ();
+	ImageSpec* spec =new ImageSpec(xres,yres,channels,TypeDesc::UINT8);
+    out->open (filename, *spec);
+	out->write_image (TypeDesc::UINT8, pixels);
+	out->close ();
 }
 
 ImgProc::ImgProc(const ImgProc& v) :
