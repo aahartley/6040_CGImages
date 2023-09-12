@@ -3,6 +3,11 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
+#include <algorithm>
+
+#include <OpenImageIO/imageio.h>
+
 #include "Constants.h"
 
 namespace img{
@@ -25,6 +30,9 @@ class ImgProc
 	
 	void value(int i, int j, std::vector<float>& pixel) const;
 	void set_value(int i, int j, const std::vector<float>& pixel);
+
+    void read_image(const std::string& s);
+	void write_image();
 
 	ImgProc(const ImgProc& img); //copy constructor
 	ImgProc& operator=(const ImgProc& img); //copy assignment

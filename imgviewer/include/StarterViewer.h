@@ -20,12 +20,17 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <cmath>
+#include <cstring>
+
 #include <GL/gl.h>   // OpenGL itself.
 #include <GL/glu.h>  // GLU support library.
 #include <GL/glut.h> // GLUT support library.
+
 #include "ImgProc.h"
 
-using namespace std;
 
 namespace starter{
 
@@ -91,14 +96,10 @@ class StarterViewer
     //! Cascading callback to home parameters
     void Home();
 
-    //! Get the current frame
-    int GetFrame() const { return frame; }
-
     //! Cascading callback for usage information
     void Usage();
 
-    //! Set the camera for 3D viewing.
-    void SetCameraEyeViewUp( float eyex, float eyey, float eyez, float viewx, float viewy, float viewz, float upx, float upy, float upz ); 
+   
 
   private:
 
@@ -115,20 +116,6 @@ class StarterViewer
     img::ImgProc imgProc;
 
 
-   
-    float camera_fov;
-    float camera_aspect;
-    float camera_near;
-    float camera_far;
-    float camera_eye_x, camera_eye_y, camera_eye_z;
-    float camera_view_x, camera_view_y, camera_view_z;
-    float camera_up_x, camera_up_y, camera_up_z;
-    float camera_right_x, camera_right_y, camera_right_z;
-
-    int frame;
-
-    void ComputeEyeUpRight(int dx, int dy);
-    void ComputeEyeShift(float dz);
 
     static StarterViewer* pStarterViewer;
 
