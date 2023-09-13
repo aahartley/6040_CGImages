@@ -1,3 +1,13 @@
+//-------------------------------------------------------
+//
+//  ImgViewer.h
+//
+//  This viewer runs the program,
+//  parses cmd line arguments, and
+//  will execute ImgProc methods.
+//  
+//
+//--------------------------------------------------------
 #ifndef IMGVIEWER_H
 #define IMGVIEWER_H
 
