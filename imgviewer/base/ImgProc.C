@@ -60,7 +60,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	if( i<0 || i>=Nx ){ return; }
 	if( j<0 || j>=Ny ){ return; }
 	if( Nc > (int)pixel.size() ){ return; }
-	//#pragma omp parallel for  //causing false sharing? kills performance
+	//#pragma omp parallel for  // kills performance, false sharing?
 	for( int c=0;c<Nc;c++ )
 	{
 		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
@@ -69,7 +69,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	return;
 }
 
-void ImgProc::read_image(const std::string& s)
+int ImgProc::read_image(const std::string& s)
 {
 	std::string filename = s;
 	std::cout << "\nAttempting to find: " << filename << std::endl;
@@ -99,6 +99,7 @@ void ImgProc::read_image(const std::string& s)
 
 	//flip image vertically
 	//row to width
+	#pragma omp parallel for collapse(2)
 	for(int i=0; i<xres;i++)
 	{
 		//col to height
@@ -152,6 +153,7 @@ void ImgProc::write_image(std::string fileName)
 	std::string filename = fn+"jpgdemo.jpeg";
 	std::cout << "writing: " << filename <<'\n';
 	unsigned char* pixel= new unsigned char[xres * yres * channels];
+	#pragma omp parallel for
 	for(int i=0; i<xres*yres*channels; i++)
 	{
 		pixel[i]= pixels[i];
