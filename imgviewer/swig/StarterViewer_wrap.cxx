@@ -4901,66 +4901,6 @@ SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
   return res;
 }
 
-
-/* Getting isfinite working pre C99 across multiple platforms is non-trivial. Users can provide SWIG_isfinite on older platforms. */
-#ifndef SWIG_isfinite
-/* isfinite() is a macro for C99 */
-# if defined(isfinite)
-#  define SWIG_isfinite(X) (isfinite(X))
-# elif defined(__cplusplus) && __cplusplus >= 201103L
-/* Use a template so that this works whether isfinite() is std::isfinite() or
- * in the global namespace.  The reality seems to vary between compiler
- * versions.
- *
- * Make sure namespace std exists to avoid compiler warnings.
- *
- * extern "C++" is required as this fragment can end up inside an extern "C" { } block
- */
-namespace std { }
-extern "C++" template<typename T>
-inline int SWIG_isfinite_func(T x) {
-  using namespace std;
-  return isfinite(x);
-}
-#  define SWIG_isfinite(X) (SWIG_isfinite_func(X))
-# elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
-#  define SWIG_isfinite(X) (__builtin_isfinite(X))
-# elif defined(__clang__) && defined(__has_builtin)
-#  if __has_builtin(__builtin_isfinite)
-#   define SWIG_isfinite(X) (__builtin_isfinite(X))
-#  endif
-# elif defined(_MSC_VER)
-#  define SWIG_isfinite(X) (_finite(X))
-# elif defined(__sun) && defined(__SVR4)
-#  include <ieeefp.h>
-#  define SWIG_isfinite(X) (finite(X))
-# endif
-#endif
-
-
-/* Accept infinite as a valid float value unless we are unable to check if a value is finite */
-#ifdef SWIG_isfinite
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX) && SWIG_isfinite(X))
-#else
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX))
-#endif
-
-
-SWIGINTERN int
-SWIG_AsVal_float (PyObject * obj, float *val)
-{
-  double v;
-  int res = SWIG_AsVal_double (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if (SWIG_Float_Overflow_Check(v)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< float >(v);
-    }
-  }  
-  return res;
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -7958,13 +7898,14 @@ SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
   img::ImgProc *arg2 = 0 ;
+  std::string arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  PyObject *swig_obj[2] ;
+  PyObject *swig_obj[3] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetImage", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetImage", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_SetImage" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
@@ -7978,7 +7919,16 @@ SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
   }
   arg2 = reinterpret_cast< img::ImgProc * >(argp2);
-  (arg1)->SetImage((img::ImgProc const &)*arg2);
+  {
+    std::string *ptr = (std::string *)0;
+    int res = SWIG_AsPtr_std_string(swig_obj[2], &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "StarterViewer_SetImage" "', argument " "3"" of type '" "std::string""'"); 
+    }
+    arg3 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
+  }
+  (arg1)->SetImage((img::ImgProc const &)*arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8291,29 +8241,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_StarterViewer_GetFrame(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  int result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_GetFrame" "', argument " "1"" of type '" "starter::StarterViewer const *""'"); 
-  }
-  arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  result = (int)((starter::StarterViewer const *)arg1)->GetFrame();
-  resultobj = SWIG_From_int(static_cast< int >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_StarterViewer_Usage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
@@ -8329,99 +8256,6 @@ SWIGINTERN PyObject *_wrap_StarterViewer_Usage(PyObject *SWIGUNUSEDPARM(self), P
   }
   arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
   (arg1)->Usage();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_StarterViewer_SetCameraEyeViewUp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
-  float arg6 ;
-  float arg7 ;
-  float arg8 ;
-  float arg9 ;
-  float arg10 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  float val3 ;
-  int ecode3 = 0 ;
-  float val4 ;
-  int ecode4 = 0 ;
-  float val5 ;
-  int ecode5 = 0 ;
-  float val6 ;
-  int ecode6 = 0 ;
-  float val7 ;
-  int ecode7 = 0 ;
-  float val8 ;
-  int ecode8 = 0 ;
-  float val9 ;
-  int ecode9 = 0 ;
-  float val10 ;
-  int ecode10 = 0 ;
-  PyObject *swig_obj[10] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetCameraEyeViewUp", 10, 10, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
-  }
-  arg1 = reinterpret_cast< starter::StarterViewer * >(argp1);
-  ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "3"" of type '" "float""'");
-  } 
-  arg3 = static_cast< float >(val3);
-  ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "4"" of type '" "float""'");
-  } 
-  arg4 = static_cast< float >(val4);
-  ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "5"" of type '" "float""'");
-  } 
-  arg5 = static_cast< float >(val5);
-  ecode6 = SWIG_AsVal_float(swig_obj[5], &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "6"" of type '" "float""'");
-  } 
-  arg6 = static_cast< float >(val6);
-  ecode7 = SWIG_AsVal_float(swig_obj[6], &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "7"" of type '" "float""'");
-  } 
-  arg7 = static_cast< float >(val7);
-  ecode8 = SWIG_AsVal_float(swig_obj[7], &val8);
-  if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "8"" of type '" "float""'");
-  } 
-  arg8 = static_cast< float >(val8);
-  ecode9 = SWIG_AsVal_float(swig_obj[8], &val9);
-  if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "9"" of type '" "float""'");
-  } 
-  arg9 = static_cast< float >(val9);
-  ecode10 = SWIG_AsVal_float(swig_obj[9], &val10);
-  if (!SWIG_IsOK(ecode10)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "StarterViewer_SetCameraEyeViewUp" "', argument " "10"" of type '" "float""'");
-  } 
-  arg10 = static_cast< float >(val10);
-  (arg1)->SetCameraEyeViewUp(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8524,9 +8358,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "StarterViewer_Reshape", _wrap_StarterViewer_Reshape, METH_VARARGS, NULL},
 	 { "StarterViewer_Reset", _wrap_StarterViewer_Reset, METH_O, NULL},
 	 { "StarterViewer_Home", _wrap_StarterViewer_Home, METH_O, NULL},
-	 { "StarterViewer_GetFrame", _wrap_StarterViewer_GetFrame, METH_O, NULL},
 	 { "StarterViewer_Usage", _wrap_StarterViewer_Usage, METH_O, NULL},
-	 { "StarterViewer_SetCameraEyeViewUp", _wrap_StarterViewer_SetCameraEyeViewUp, METH_VARARGS, NULL},
 	 { "StarterViewer_swigregister", StarterViewer_swigregister, METH_O, NULL},
 	 { "CreateViewer", _wrap_CreateViewer, METH_NOARGS, NULL},
 	 { NULL, NULL, 0, NULL }

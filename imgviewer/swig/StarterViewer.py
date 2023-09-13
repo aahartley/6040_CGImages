@@ -264,8 +264,13 @@ class StarterViewer(object):
     def GetTitle(self):
         return _StarterViewer.StarterViewer_GetTitle(self)
 
+<<<<<<< HEAD
+    def SetImage(self, img, fileN):
+        return _StarterViewer.StarterViewer_SetImage(self, img, fileN)
+=======
     def SetImage(self, img):
         return _StarterViewer.StarterViewer_SetImage(self, img)
+>>>>>>> 387fb65afcdb4b4b8bce6a57cf5875b2de6ae515
 
     def Display(self):
         return _StarterViewer.StarterViewer_Display(self)
@@ -294,14 +299,8 @@ class StarterViewer(object):
     def Home(self):
         return _StarterViewer.StarterViewer_Home(self)
 
-    def GetFrame(self):
-        return _StarterViewer.StarterViewer_GetFrame(self)
-
     def Usage(self):
         return _StarterViewer.StarterViewer_Usage(self)
-
-    def SetCameraEyeViewUp(self, eyex, eyey, eyez, viewx, viewy, viewz, upx, upy, upz):
-        return _StarterViewer.StarterViewer_SetCameraEyeViewUp(self, eyex, eyey, eyez, viewx, viewy, viewz, upx, upy, upz)
 
 # Register StarterViewer in _StarterViewer:
 _StarterViewer.StarterViewer_swigregister(StarterViewer)

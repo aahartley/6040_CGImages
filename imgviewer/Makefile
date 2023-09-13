@@ -4,8 +4,9 @@ OFILES = \
          base/Matrix.o \
          base/LinearAlgebra.o \
 	 	 base/StarterViewer.o \
-		 base/ImgProc.o \
-		 base/ImgViewer.o
+		  base/ImgProc.o \
+		  base/ImgViewer.o \
+
 		  
 
 
@@ -15,10 +16,9 @@ ROOTDIR = .
 LIB = $(ROOTDIR)/lib/libstarter.a 
 
 
-GLLDFLAGS     = -lglut -lGL -lm -lGLU
+GLLDFLAGS     = -lglut -lGL -lm -lGLU 
 
-
-CXX = g++ -Wall -g -O2 -fPIC $(DEFINES) -fopenmp -std=c++14
+CXX = g++ -Wall -g -O0 -fPIC  $(DEFINES) -fopenmp -std=c++14 
 PYTHONINCLUDE = -I/usr/include/python3.8
 SWIGLD = $(CXX) -shared
 SWIGEXEC = swig
@@ -39,7 +39,7 @@ base: $(OFILES)
 	$(SWIGLD) swig/StarterViewer_wrap.o  $(SWIGLIB) -ldl -L./lib -lstarter $(GLLDFLAGS)  -o swig/_StarterViewer.so
 	cp swig/StarterViewer.py python/
 	cp swig/_StarterViewer.so python/
-	$(CXX) base/Main.C $(INCLUDES)  -L./lib -lstarter $(GLLDFLAGS)  -L ../build/lib -lOpenImageIO -o bin/imgviewer
+	$(CXX) base/Main.C $(INCLUDES)  -L./lib  -lstarter $(GLLDFLAGS)  -L ../build/lib -lOpenImageIO -o bin/imgviewer
 
 clean:
 	rm -rf bin/simple_viewer doc/html *.o base/*.o base/*~ include/*~ python/*~ $(LIB)  *~ swig/*.cxx swig/*~ swig/*.so swig/*.o swig/StarterViewer.py swig/*.pyc ./*.pyc python/*StarterViewer*
