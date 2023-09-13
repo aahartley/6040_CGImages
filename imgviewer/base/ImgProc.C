@@ -97,7 +97,8 @@ int ImgProc::read_image(const std::string& s)
 	}
 	//std::reverse(pixel.begin(),pixel.end()); alternative
 
-	//flip image vertically
+	//TypeDesc::FLOAT causing segmentation fault
+	//flip image vertically and convert uint8 to float (0-1) manually
 	//row to width
 	#pragma omp parallel for collapse(2)
 	for(int i=0; i<xres;i++)
