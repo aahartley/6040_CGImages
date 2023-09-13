@@ -151,6 +151,7 @@ void ImgProc::write_image(std::string fileName)
 
     std::size_t pos = fileName.find(".");
     std::string fn = fileName.substr(0,pos);
+	//save new file to the original filepath
 	std::string filename = fn+"jpgdemo.jpeg";
 	std::cout << "writing: " << filename <<'\n';
 	unsigned char* pixel= new unsigned char[xres * yres * channels];
