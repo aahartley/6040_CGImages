@@ -18,7 +18,7 @@ LIB = $(ROOTDIR)/lib/libstarter.a
 
 GLLDFLAGS     = -lglut -lGL -lm -lGLU 
 
-CXX = g++ -Wall -g -O0 -fPIC  $(DEFINES) -fopenmp -std=c++14 
+CXX = g++ -Wall -g -O2 -fPIC  $(DEFINES) -fopenmp -std=c++14 
 PYTHONINCLUDE = -I/usr/include/python3.8
 SWIGLD = $(CXX) -shared
 SWIGEXEC = swig
