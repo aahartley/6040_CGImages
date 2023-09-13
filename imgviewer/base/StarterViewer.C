@@ -13,9 +13,7 @@
 //--------------------------------------------------------
 #include "StarterViewer.h"
 
-#include <GL/gl.h>   // OpenGL itself.
-#include <GL/glu.h>  // GLU support library.
-#include <GL/glut.h> // GLUT support library.
+
 using namespace std;
 using namespace img;
 
@@ -25,7 +23,7 @@ namespace starter{
 // These are the GLUT Callbacks that are implemented in StarterViewer.
 void cbDisplayFunc()
 {
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
+   glClear( GL_COLOR_BUFFER_BIT );	
    StarterViewer::Instance() -> Display();
    glutSwapBuffers();
    glutPostRedisplay();
@@ -67,7 +65,7 @@ StarterViewer::StarterViewer() :
    initialized    ( false ),
    width          ( 512 ), 
    height         ( 512 ),
-   display_mode   ( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH ),
+   display_mode   (GLUT_SINGLE | GLUT_RGBA  ),
    title          ( string("Img Viewer") ),
    mouse_x        ( 0 ),
    mouse_y        ( 0 )
@@ -94,7 +92,8 @@ void StarterViewer::Init( const std::vector<std::string>& args )
    glutInitWindowSize( width, height );
    glutCreateWindow( window_title.c_str() );
    glClearColor(0.5,0.5,0.6,0.0);
-
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //enable transparency
+   glEnable( GL_BLEND );
    glutDisplayFunc( &cbDisplayFunc );
    glutIdleFunc( &cbIdleFunc );
    glutKeyboardFunc( &cbKeyboardFunc );
@@ -104,17 +103,19 @@ void StarterViewer::Init( const std::vector<std::string>& args )
 
    initialized = true;
    cout << "ImgViewer Initialized\n";
+   Usage();
+
 }
 
 void StarterViewer::MainLoop()
 {
-   Usage();
    glutMainLoop();
 }
 
 
 void StarterViewer::Display()
 {
+   //Draw image based off color channels
    if(imgProc.depth() == 3)
    {
       glDrawPixels( imgProc.nx(), imgProc.ny(), GL_RGB, GL_FLOAT, imgProc.raw() );
@@ -143,7 +144,7 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
    {
       case 'j':
       case 'J':
-         imgProc.write_image();
+         imgProc.write_image(fileName); //write jpg
          break;
       case 'r':
 	      Reset();

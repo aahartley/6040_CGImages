@@ -7898,13 +7898,14 @@ SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   starter::StarterViewer *arg1 = (starter::StarterViewer *) 0 ;
   img::ImgProc *arg2 = 0 ;
+  std::string arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  PyObject *swig_obj[2] ;
+  PyObject *swig_obj[3] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetImage", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "StarterViewer_SetImage", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_starter__StarterViewer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "StarterViewer_SetImage" "', argument " "1"" of type '" "starter::StarterViewer *""'"); 
@@ -7918,7 +7919,16 @@ SWIGINTERN PyObject *_wrap_StarterViewer_SetImage(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "StarterViewer_SetImage" "', argument " "2"" of type '" "img::ImgProc const &""'"); 
   }
   arg2 = reinterpret_cast< img::ImgProc * >(argp2);
-  (arg1)->SetImage((img::ImgProc const &)*arg2);
+  {
+    std::string *ptr = (std::string *)0;
+    int res = SWIG_AsPtr_std_string(swig_obj[2], &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "StarterViewer_SetImage" "', argument " "3"" of type '" "std::string""'"); 
+    }
+    arg3 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
+  }
+  (arg1)->SetImage((img::ImgProc const &)*arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:

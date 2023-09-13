@@ -1,3 +1,11 @@
+//-------------------------------------------------------
+//
+//  ImgProc.h
+//
+//  Stores the image pixels and the methods to manipulate
+//  them. Handles the IO of images.
+//  
+//--------------------------------------------------------
 #ifndef IMGPROC_H
 #define IMGPROC_H
 
@@ -31,18 +39,17 @@ class ImgProc
 	void value(int i, int j, std::vector<float>& pixel) const;
 	void set_value(int i, int j, const std::vector<float>& pixel);
 
-    void read_image(const std::string& s);
-	void write_image();
+    int read_image(const std::string& s);
+	void write_image(std::string fileName);
 
 	ImgProc(const ImgProc& img); //copy constructor
 	ImgProc& operator=(const ImgProc& img); //copy assignment
 
-  private:
-
+  private:	
+  
 	int Nx, Ny, Nc;
 	long Nsize;
 	float* img_data;
-	std::string fn;
 };
 }
 #endif

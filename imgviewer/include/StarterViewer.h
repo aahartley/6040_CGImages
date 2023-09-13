@@ -25,6 +25,9 @@
 #include <cmath>
 #include <cstring>
 
+#include <GL/gl.h>   // OpenGL itself.
+#include <GL/glu.h>  // GLU support library.
+#include <GL/glut.h> // GLUT support library.
 
 #include "ImgProc.h"
 
@@ -71,7 +74,7 @@ class StarterViewer
     const std::string& GetTitle() { return title; }
 
     //! Set the Image
-    void SetImage(const img::ImgProc& img) {imgProc = img;}
+    void SetImage(const img::ImgProc& img, std::string fileN) {imgProc = img, fileName=fileN;}
 
     // Callback functions
     //! Cascading callback for initiating a display event
@@ -111,7 +114,7 @@ class StarterViewer
     float current_raster_pos[4];
     
     img::ImgProc imgProc;
-
+    std::string fileName;
 
 
     static StarterViewer* pStarterViewer;

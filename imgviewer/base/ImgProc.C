@@ -1,3 +1,11 @@
+//-------------------------------------------------------
+//
+//  ImgProc.C
+//
+//  Stores the image pixels and the methods to manipulate
+//  them. Handles the IO of images.
+//  
+//--------------------------------------------------------
 #include "ImgProc.h"
 
 using namespace img;
@@ -18,7 +26,7 @@ void ImgProc::clear()
 	Nc=0;
 	Nsize=0;
 }
-
+//clears data, sets size for img
 void ImgProc::clear(int nX, int nY, int nC)
 {
 	clear();
@@ -31,7 +39,7 @@ void ImgProc::clear(int nX, int nY, int nC)
 	#pragma omp parallel for
 	for(long i=0; i<Nsize; i++) { img_data[i] = 0.0; }
 }
-
+//updates pixel color from img_data
 void ImgProc::value( int i, int j, std::vector<float>& pixel) const
 {
 	pixel.clear();
@@ -45,7 +53,7 @@ void ImgProc::value( int i, int j, std::vector<float>& pixel) const
 	}
 	return;
 }
-
+//updates img_data from pixel colors
 void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 {
 	if( img_data == nullptr ){ return; }
@@ -64,13 +72,12 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 void ImgProc::read_image(const std::string& s)
 {
 	std::string filename = s;
-	fn=filename;
 	std::cout << "\nAttempting to find: " << filename << std::endl;
 	auto inp = ImageInput::open(filename);
 	if (! inp)
 	{
 		std::cout << "Couldn't find " << filename << std::endl;
-    	return;
+    	return 1;
 	}
 	const ImageSpec &spec = inp->spec();
 	int xres = spec.width;
@@ -83,12 +90,14 @@ void ImgProc::read_image(const std::string& s)
 	clear(xres,yres,nchannels);
 
 	std::vector<uint8_t> pixel(xres*yres*nchannels);
+	//flip image horizontally
 	for(int i=xres*yres*nchannels-1; i>=0;i--)
 	{
-		//flip image horizontally
 		pixel[i]=pixels[(xres*yres*nchannels-1)-i];
 	}
-	//std::reverse(pixel.begin(),pixel.end());
+	//std::reverse(pixel.begin(),pixel.end()); alternative
+
+	//flip image vertically
 	//row to width
 	for(int i=0; i<xres;i++)
 	{
@@ -99,7 +108,6 @@ void ImgProc::read_image(const std::string& s)
 
 			if(nchannels==3)
 			{
-				//flip image vertically
 				int index = ((xres-1)-i + j*xres)*nchannels; //starts at B
 				p[2]=(float)pixel[index]*(1.0f/(float)0xFF); //optimize by shifting, pre-compiled lookuptable?
 				p[1]=(float)pixel[index+1]*(1.0f/(float)0xFF);
@@ -107,8 +115,7 @@ void ImgProc::read_image(const std::string& s)
 			}
 			else if(nchannels==4)
 			{
-				//flip image vertically
-				int index = ((xres-1)-i + j*xres)*nchannels; //starts at B
+				int index = ((xres-1)-i + j*xres)*nchannels; //starts at A
 				p[3]=float(pixel[index])*(1.0f/(float)0xFF);
 				p[2]=float(pixel[index+1])*(1.0f/(float)0xFF);
 				p[1]=float(pixel[index+2])*(1.0f/(float)0xFF);
@@ -118,31 +125,32 @@ void ImgProc::read_image(const std::string& s)
 
 		}
 	}
-	write_image();
+	std::cout <<"Image loaded\n";
+	return 0;
 }
 
 
-void ImgProc::write_image()
+void ImgProc::write_image(std::string fileName)
 {
-	auto inp = ImageInput::open(fn);
+	//reload image to automatically adjust pixel data to fit jpg format
+	auto inp = ImageInput::open(fileName);
 	if (! inp)
 	{
-		//std::cout << "Couldn't find " << filename << std::endl;
+		std::cout << "Couldn't find " << fileName << std::endl;
     	return;
 	}
 	const ImageSpec &spec = inp->spec();
 	int xres = spec.width;
 	int yres = spec.height;
-	int nchannels = spec.nchannels;
-	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * nchannels]);
-	inp->read_image(0, 0, 0, nchannels, TypeDesc::UINT8, &pixels[0]);
+	int channels = 3;  // RGB
+	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * channels]);
+	inp->read_image(0, 0, 0, channels, TypeDesc::UINT8, &pixels[0]);
 	inp->close();
 
-
-	const char *filename = "/home/aahartl/Pictures/skydemo.jpeg";
-	//const int xres = Nx, yres = Ny;
-	std::cout << Nx <<'\n';
-	const int channels = 3;  // RGB
+    std::size_t pos = fileName.find(".");
+    std::string fn = fileName.substr(0,pos);
+	std::string filename = fn+"jpgdemo.jpeg";
+	std::cout << "writing: " << filename <<'\n';
 	unsigned char* pixel= new unsigned char[xres * yres * channels];
 	for(int i=0; i<xres*yres*channels; i++)
 	{
@@ -152,13 +160,15 @@ void ImgProc::write_image()
 	std::unique_ptr<ImageOutput> out = ImageOutput::create (filename);
 	if (! out)
 	{
-		std::cout<< "error\n";
+		std::cout<< "write error\n";
     	return;
 	}
-	///ImageSpec spec1(xres, yres, channels, TypeDesc::UINT8);
-	out->open (filename, spec);
+	//OIIO should delte this pointer for me?
+	ImageSpec* spec1 = new ImageSpec(xres, yres, channels, TypeDesc::UINT8); //no pointer causing linking error
+	out->open (filename, *spec1);
 	out->write_image (TypeDesc::UINT8, &pixels[0]);
 	out->close ();
+	std::cout << "write successful\n";
 }
 
 ImgProc::ImgProc(const ImgProc& v) :
