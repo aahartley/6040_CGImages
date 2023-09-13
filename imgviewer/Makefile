@@ -4,8 +4,8 @@ OFILES = \
          base/Matrix.o \
          base/LinearAlgebra.o \
 	 	 base/StarterViewer.o \
-		  base/ImgProc.o \
-		  base/ImgViewer.o \
+		 base/ImgProc.o \
+		 base/ImgViewer.o \
 
 		  
 
