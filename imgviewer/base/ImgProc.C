@@ -60,7 +60,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	if( i<0 || i>=Nx ){ return; }
 	if( j<0 || j>=Ny ){ return; }
 	if( Nc > (int)pixel.size() ){ return; }
-	//#pragma omp parallel for
+	//#pragma omp parallel for  //causing false sharing? kills performance
 	for( int c=0;c<Nc;c++ )
 	{
 		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
