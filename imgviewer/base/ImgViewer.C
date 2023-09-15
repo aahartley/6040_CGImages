@@ -16,7 +16,6 @@ using namespace img;
 void ImgViewer::run(const int argc, char const* const* argv){
 	StarterViewer* viewer = CreateViewer();
     std::vector<std::string> args;
-	viewer->Init(args);
 
     for(int i=0;i<argc;i++)
     {
@@ -36,6 +35,7 @@ void ImgViewer::run(const int argc, char const* const* argv){
 			}
 		}
 	}
+	viewer->Init(args);
     viewer->MainLoop();
 }
 

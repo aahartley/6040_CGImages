@@ -64,11 +64,12 @@ StarterViewer* StarterViewer::pStarterViewer = nullptr;
 StarterViewer::StarterViewer() : 
    initialized    ( false ),
    width          ( 512 ), 
-   height         ( 512 ),
+   height         ( 512),
    display_mode   (GLUT_SINGLE | GLUT_RGBA  ),
    title          ( string("Img Viewer") ),
    mouse_x        ( 0 ),
-   mouse_y        ( 0 )
+   mouse_y        ( 0 ),
+   fileName       ("")
 {
    cout << "ImgViewer Loaded\n";
 }
@@ -84,10 +85,14 @@ void StarterViewer::Init( const std::vector<std::string>& args )
       argv[i] = new char[args[i].length() + 1];
       std::strcpy(argv[i], args[i].c_str());
    }
-
+   glutInit( &argc, argv );
    string window_title = title;
 
-   glutInit( &argc, argv );
+   if(imgProc.nx()!=0)width=imgProc.nx();
+   if(imgProc.ny()!=0)height=imgProc.ny();
+   if(width > 1300) width = 1300;  //should fit most displays
+   if(height> 600) height = 600;
+
    glutInitDisplayMode( display_mode );
    glutInitWindowSize( width, height );
    glutCreateWindow( window_title.c_str() );
@@ -144,7 +149,8 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
    {
       case 'j':
       case 'J':
-         imgProc.write_image(fileName,'j'); //write jpg
+         if(fileName!="") //dont allow writing unless image has been found
+            imgProc.write_image(fileName,'j'); //write jpg
          break;
       case 'r':
 	      Reset();

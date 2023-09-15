@@ -60,7 +60,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	if( i<0 || i>=Nx ){ return; }
 	if( j<0 || j>=Ny ){ return; }
 	if( Nc > (int)pixel.size() ){ return; }
-	//#pragma omp parallel for  // kills performance, false sharing?
+	//#pragma omp parallel for  //outer loops already in parallel
 	for( int c=0;c<Nc;c++ )
 	{
 		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
@@ -83,22 +83,22 @@ int ImgProc::read_image(const std::string& s)
 	int xres = spec.width;
 	int yres = spec.height;
 	int nchannels = spec.nchannels;
-	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * nchannels]);
-	inp->read_image(0, 0, 0, nchannels, TypeDesc::UINT8, &pixels[0]);
+	auto pixels = std::unique_ptr<float[]>(new float[xres * yres * nchannels]);
+	inp->read_image(0, 0, 0, nchannels, TypeDesc::FLOAT, &pixels[0]);
 	inp->close();
 
 	clear(xres,yres,nchannels);
 
-	std::vector<uint8_t> pixel(xres*yres*nchannels);
+	std::vector<float> pixel(xres*yres*nchannels);
 	//flip image horizontally
+	#pragma omp parallel for
 	for(int i=xres*yres*nchannels-1; i>=0;i--)
 	{
 		pixel[i]=pixels[(xres*yres*nchannels-1)-i];
 	}
 	//std::reverse(pixel.begin(),pixel.end()); alternative
 
-	//TypeDesc::FLOAT causing segmentation fault
-	//flip image vertically and convert uint8 to float (0-1) manually
+	//flip image vertically
 	//row to width
 	#pragma omp parallel for collapse(2)
 	for(int i=0; i<xres;i++)
@@ -111,74 +111,99 @@ int ImgProc::read_image(const std::string& s)
 			if(nchannels==3)
 			{
 				int index = ((xres-1)-i + j*xres)*nchannels; //starts at B
-				p[2]=(float)pixel[index]*(1.0f/(float)0xFF); //optimize by shifting, pre-compiled lookuptable?
-				p[1]=(float)pixel[index+1]*(1.0f/(float)0xFF);
-				p[0]=(float)pixel[index+2]*(1.0f/(float)0xFF);
+				p[2] = pixel[index];    
+				p[1] = pixel[index+1];  
+				p[0] = pixel[index+2];  
+
+				// convert uint8 to float (0-1) manually
+				// pixel[index]*(1.0f/(float)0xFF); //optimize by shifting, pre-compiled lookuptable?
+
 			}
 			else if(nchannels==4)
 			{
 				int index = ((xres-1)-i + j*xres)*nchannels; //starts at A
-				p[3]=float(pixel[index])*(1.0f/(float)0xFF);
-				p[2]=float(pixel[index+1])*(1.0f/(float)0xFF);
-				p[1]=float(pixel[index+2])*(1.0f/(float)0xFF);
-				p[0]=float(pixel[index+3])*(1.0f/(float)0xFF);
+				p[3] = pixel[index];   
+				p[2] = pixel[index+1];  
+				p[1] = pixel[index+2]; 
+				p[0] = pixel[index+3];  
 			}
 			set_value(i,j,p);
 
 		}
 	}
-	std::cout <<"Image loaded\n";
+	std::cout <<"Image loaded\n\n";
 	return 0;
 }
 
-
+//function will not be called unless image has been read
 void ImgProc::write_image(std::string fileName, char f)
 {
-	int xres=0;
-	int yres=0;
-	int channels=0;
-	std::unique_ptr<unsigned char[]> pixels;
+	int xres = Nx;
+	int yres = Ny;
+	int channels = 0;
+	float* pixels = nullptr;
+	std::string nfileName;
 	if(f=='j') ///jpg
 	{
-		//reload image to automatically convert pixel data to fit jpg format
-		auto inp = ImageInput::open(fileName);
-		if (! inp)
+		channels=3;
+		std::size_t pos = fileName.find(".");
+    	std::string fn = fileName.substr(0,pos);
+		//save new file to the original filepath
+		nfileName = fn+"jpgdemo.jpeg";
+		std::cout << "Writing: " << nfileName <<'\n';
+	
+		pixels= new float[xres * yres * channels];
+		//flip vertically to match OIIO
+		//row to width
+		
+		#pragma omp parallel for collapse(2)
+		for(int i=0; i<xres;i++)
 		{
-			std::cout << "Couldn't find " << fileName << std::endl;
-			return;
+			//col to height
+			for(int j=0; j<yres;j++)
+			{
+				if(Nc==3)
+				{
+					int ind = ((xres-1)-i + j*xres)*channels; //starts at B
+					pixels[ind]= img_data[index(i,j,2,Nc,Nx)];    
+					pixels[ind+1]= img_data[index(i,j,1,Nc,Nx)];
+					pixels[ind+2]= img_data[index(i,j,0,Nc,Nx)];
+				}
+				else if(Nc==4)
+				{
+					int ind = ((xres-1)-i + j*xres)*channels; //starts at B
+					pixels[ind]= img_data[index(i,j,2,Nc,Nx)];    
+					pixels[ind+1]= img_data[index(i,j,1,Nc,Nx)];
+					pixels[ind+2]= img_data[index(i,j,0,Nc,Nx)];
+				}
+			}
 		}
-		const ImageSpec &spec = inp->spec();
-		xres = spec.width;
-		yres = spec.height;
-		channels = 3;  // RGB
-		pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * channels]);
-		inp->read_image(0, 0, 0, channels, TypeDesc::UINT8, &pixels[0]);
-		inp->close();
 	}
-
-    std::size_t pos = fileName.find(".");
-    std::string fn = fileName.substr(0,pos);
-	//save new file to the original filepath
-	std::string filename = fn+"jpgdemo.jpeg";
-	std::cout << "writing: " << filename <<'\n';
-	unsigned char* pixel= new unsigned char[xres * yres * channels];
+	//flip horizontally to match OIIO
+	//reversing array
+	float temp;
+	int length = xres*yres*channels;
 	#pragma omp parallel for
-	for(int i=0; i<xres*yres*channels; i++)
-	{
-		pixel[i]= pixels[i];
-	}
+	for (int i = 0; i < length/2; i++)
+    {
+        temp = pixels[i];
+        pixels[i] = pixels[(length - 1) - i];
+        pixels[(length - 1) - i] = temp;
 
-	std::unique_ptr<ImageOutput> out = ImageOutput::create (filename);
+    }
+
+	std::unique_ptr<ImageOutput> out = ImageOutput::create (nfileName);
 	if (! out)
 	{
-		std::cout<< "write error\n";
+		std::cout<< "Write error\n";
     	return;
 	}
-	ImageSpec spec1(xres, yres, channels, TypeDesc::UINT8); 
-	out->open (filename, spec1);
-	out->write_image (TypeDesc::UINT8, pixel);
+	ImageSpec spec(xres, yres, channels, TypeDesc::FLOAT); 
+	out->open (nfileName, spec);
+	out->write_image (TypeDesc::FLOAT, pixels);
 	out->close ();
-	std::cout << "write successful\n";
+	std::cout << "Write successful\n";
+	delete [] pixels;
 }
 
 ImgProc::ImgProc(const ImgProc& v) :
