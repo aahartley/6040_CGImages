@@ -144,7 +144,7 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
    {
       case 'j':
       case 'J':
-         imgProc.write_image(fileName); //write jpg
+         imgProc.write_image(fileName,'j'); //write jpg
          break;
       case 'r':
 	      Reset();

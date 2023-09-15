@@ -40,7 +40,7 @@ class ImgProc
 	void set_value(int i, int j, const std::vector<float>& pixel);
 
     int read_image(const std::string& s);
-	void write_image(std::string fileName);
+	void write_image(std::string fileName, char f);
 
 	ImgProc(const ImgProc& img); //copy constructor
 	ImgProc& operator=(const ImgProc& img); //copy assignment

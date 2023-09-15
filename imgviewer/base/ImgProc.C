@@ -132,22 +132,29 @@ int ImgProc::read_image(const std::string& s)
 }
 
 
-void ImgProc::write_image(std::string fileName)
+void ImgProc::write_image(std::string fileName, char f)
 {
-	//reload image to automatically adjust pixel data to fit jpg format
-	auto inp = ImageInput::open(fileName);
-	if (! inp)
+	int xres=0;
+	int yres=0;
+	int channels=0;
+	std::unique_ptr<unsigned char[]> pixels;
+	if(f=='j') ///jpg
 	{
-		std::cout << "Couldn't find " << fileName << std::endl;
-    	return;
+		//reload image to automatically convert pixel data to fit jpg format
+		auto inp = ImageInput::open(fileName);
+		if (! inp)
+		{
+			std::cout << "Couldn't find " << fileName << std::endl;
+			return;
+		}
+		const ImageSpec &spec = inp->spec();
+		xres = spec.width;
+		yres = spec.height;
+		channels = 3;  // RGB
+		pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * channels]);
+		inp->read_image(0, 0, 0, channels, TypeDesc::UINT8, &pixels[0]);
+		inp->close();
 	}
-	const ImageSpec &spec = inp->spec();
-	int xres = spec.width;
-	int yres = spec.height;
-	int channels = 3;  // RGB
-	auto pixels = std::unique_ptr<unsigned char[]>(new unsigned char[xres * yres * channels]);
-	inp->read_image(0, 0, 0, channels, TypeDesc::UINT8, &pixels[0]);
-	inp->close();
 
     std::size_t pos = fileName.find(".");
     std::string fn = fileName.substr(0,pos);
@@ -167,10 +174,9 @@ void ImgProc::write_image(std::string fileName)
 		std::cout<< "write error\n";
     	return;
 	}
-	//OIIO should delte this pointer for me?
-	ImageSpec* spec1 = new ImageSpec(xres, yres, channels, TypeDesc::UINT8); //no pointer causing linking error
-	out->open (filename, *spec1);
-	out->write_image (TypeDesc::UINT8, &pixels[0]);
+	ImageSpec spec1(xres, yres, channels, TypeDesc::UINT8); 
+	out->open (filename, spec1);
+	out->write_image (TypeDesc::UINT8, pixel);
 	out->close ();
 	std::cout << "write successful\n";
 }
