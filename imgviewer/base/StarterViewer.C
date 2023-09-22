@@ -65,7 +65,7 @@ StarterViewer::StarterViewer() :
    initialized    ( false ),
    width          ( 512 ), 
    height         ( 512),
-   display_mode   (GLUT_SINGLE | GLUT_RGBA  ),
+   display_mode   (GLUT_DOUBLE | GLUT_RGBA  ),
    title          ( string("Img Viewer") ),
    mouse_x        ( 0 ),
    mouse_y        ( 0 ),
@@ -150,8 +150,24 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
       case 'j':
       case 'J':
          if(fileName!="") //dont allow writing unless image has been found
-            imgProc.write_image(fileName,'j'); //write jpg
+            write_image(fileName,'j',imgProc); //write jpg
          break;
+      case 'g':{
+         ImgProc out;
+         Gamma(imgProc, out, 0.9);
+         imgProc = out;
+         }break;
+      case 'G':{
+         ImgProc out;
+         Gamma(imgProc, out, 1.111111);
+         imgProc = out;
+         }break;
+      case 's':{
+         ImgProc out;
+         Stencil stencil(5);
+         LinearConvolution(stencil, imgProc, out);
+         imgProc = out;
+         }break;
       case 'r':
 	      Reset();
          break;

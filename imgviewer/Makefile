@@ -5,6 +5,7 @@ OFILES = \
          base/LinearAlgebra.o \
 	 	 base/StarterViewer.o \
 		 base/ImgProc.o \
+		 base/Stencil.o \
 		 base/ImgViewer.o \
 
 		  

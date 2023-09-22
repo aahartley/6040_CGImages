@@ -13,10 +13,12 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <ctime>
 
 #include <OpenImageIO/imageio.h>
 
 #include "Constants.h"
+#include "Stencil.h"
 
 namespace img{
 
@@ -33,6 +35,7 @@ class ImgProc
 	int nx() const { return Nx; } 
 	int ny() const { return Ny; }
 	int depth() const { return Nc; }
+	int size() const {return Nsize;}
 	float* raw() const { return img_data;}
 	void setRaw(float* data) {img_data = data;}
 	
@@ -40,7 +43,11 @@ class ImgProc
 	void set_value(int i, int j, const std::vector<float>& pixel);
 
     int read_image(const std::string& s);
-	void write_image(std::string fileName, char f);
+	void write_image(std::string fileName, char f) const;
+
+	void LinearConvolution( const Stencil& stencil, ImgProc& out ) const;
+	void Gamma(ImgProc& out) const;
+
 
 	ImgProc(const ImgProc& img); //copy constructor
 	ImgProc& operator=(const ImgProc& img); //copy assignment
@@ -51,5 +58,11 @@ class ImgProc
 	long Nsize;
 	float* img_data;
 };
+
+int read_image(const std::string& s, ImgProc& imgProc);
+void write_image(std::string fileName, char f, const ImgProc& imgProc);
+
+void LinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
+void Gamma(const ImgProc& in, ImgProc& out, float s);
 }
 #endif

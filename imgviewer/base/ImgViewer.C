@@ -28,7 +28,7 @@ void ImgViewer::run(const int argc, char const* const* argv){
 			std::string s = args[i];
 			if(s=="-image")
 			{
-				int read = imgProc.read_image(args[i+1]);
+				int read = read_image(args[i+1], imgProc);
 				if(read==0)
 					viewer->SetImage(imgProc,args[i+1]);
 
