@@ -16,7 +16,7 @@
         {
             if(i!=half_width && j!=half_width)
             {
-                stencil_values[i*(2*half_width+1) + j] = distr(generator);
+                stencil_values[j*(2*half_width+1) + i] = distr(generator);
                 sum += stencil_values[i*(2*half_width+1) + j];
                 //std::cout << stencil_values[i*(2*half_width+1) + j] << '\n';
             }
@@ -38,9 +38,9 @@
  }
  float& Stencil::operator()(int i, int j)
  {
-    return stencil_values[i*(2*half_width+1) + j];
+    return stencil_values[j*(2*half_width+1) + i];
  }
  const float& Stencil::operator()(int i, int j) const
  {
-    return stencil_values[i*(2*half_width+1) + j];
+    return stencil_values[j*(2*half_width+1) + i];
  }

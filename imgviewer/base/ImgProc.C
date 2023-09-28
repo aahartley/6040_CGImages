@@ -311,12 +311,12 @@ int img::read_image(const std::string& s, ImgProc& imgProc)
 	//std::reverse(pixel.begin(),pixel.end()); alternative
 
 	//flip image vertically
-	//row to width
+	//row to height
 	#pragma omp parallel for collapse(2)
-	for(int i=0; i<xres;i++)
+	for(int j=0; j<yres;j++)
 	{
-		//col to height
-		for(int j=0; j<yres;j++)
+		//col to width
+		for(int i=0; i<xres;i++)
 		{
 			std::vector<float> p(nchannels);
 
@@ -368,14 +368,14 @@ void img::write_image(std::string fileName, char f, const ImgProc& imgProc)
 		std::cout << "Writing: " << nfileName <<'\n';
 	
 		pixels= new float[xres * yres * channels];
+
 		//flip vertically to match OIIO
-		//row to width
-		
+		//row to height
 		#pragma omp parallel for collapse(2)
-		for(int i=0; i<xres;i++)
+		for(int j=0; j<yres;j++)
 		{
-			//col to height
-			for(int j=0; j<yres;j++)
+			//col to width
+			for(int i=0; i<xres;i++)
 			{
 				if(imgProc.depth()==3)
 				{
@@ -420,7 +420,7 @@ void img::write_image(std::string fileName, char f, const ImgProc& imgProc)
 	std::cout << "Write successful\n";
 	delete [] pixels;
 }
-
+//bounded
 void img::LinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out )
 {
 	out.clear( in.nx(), in.ny(), in.depth() );
