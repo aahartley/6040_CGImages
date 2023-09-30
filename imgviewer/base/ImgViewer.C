@@ -30,8 +30,7 @@ void ImgViewer::run(const int argc, char const* const* argv){
 			{
 				int read = read_image(args[i+1], imgProc);
 				if(read==0)
-					viewer->SetImage(imgProc,args[i+1]);
-
+					viewer->SetImage(&imgProc,args[i+1]);
 			}
 		}
 	}

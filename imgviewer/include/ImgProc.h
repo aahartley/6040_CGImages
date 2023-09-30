@@ -37,7 +37,10 @@ class ImgProc
 	int depth() const { return Nc; }
 	int size() const {return Nsize;}
 	float* raw() const { return img_data;}
-	void setRaw(float* data) {img_data = data;}
+
+	void set_raw(float* data);
+	void set_raw_OI(float* data);
+
 	
 	void value(int i, int j, std::vector<float>& pixel) const;
 	void set_value(int i, int j, const std::vector<float>& pixel);
@@ -45,8 +48,14 @@ class ImgProc
     int read_image(const std::string& s);
 	void write_image(std::string fileName, char f) const;
 
-	void LinearConvolution( const Stencil& stencil, ImgProc& out ) const;
-	void Gamma(ImgProc& out) const;
+	void PeriodicLinearConvolution( const Stencil& stencil, ImgProc& out ) const;
+	void BoundedLinearConvolution( const Stencil& stencil, ImgProc& out ) const;
+	void Gamma(ImgProc& out, float s) const;
+	void GammaInPlace(float s);
+
+	//Affine transformations
+	void Flip();
+	void Flop();
 
 
 	ImgProc(const ImgProc& img); //copy constructor
@@ -62,7 +71,14 @@ class ImgProc
 int read_image(const std::string& s, ImgProc& imgProc);
 void write_image(std::string fileName, char f, const ImgProc& imgProc);
 
-void LinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
+//Affine transformations
+void Flip(ImgProc& in);
+void Flop(ImgProc& in);
+
+void PeriodicLinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
+void BoundedLinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
 void Gamma(const ImgProc& in, ImgProc& out, float s);
+void GammaInPlace(ImgProc& in, float s);
+
 }
 #endif

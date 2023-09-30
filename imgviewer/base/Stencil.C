@@ -4,8 +4,8 @@
  {
     half_width= halfwidth;
     stencil_values = new float[(2*half_width+1)*(2*half_width+1)];
-    const float range_from  = -1.f;
-    const float range_to    = 1.f;
+    const float range_from  = -0.1f;
+    const float range_to    = 0.1f;
     std::random_device                  rand_dev;
     std::mt19937                        generator(rand_dev());
     std::uniform_real_distribution<float>  distr(range_from, range_to);
@@ -18,12 +18,10 @@
             {
                 stencil_values[j*(2*half_width+1) + i] = distr(generator);
                 sum += stencil_values[i*(2*half_width+1) + j];
-                //std::cout << stencil_values[i*(2*half_width+1) + j] << '\n';
             }
         }
     }
-    stencil_values[half_width*(2*half_width+1) + half_width] = 1-sum;
-    //std::cout << sum+stencil_values[half_width*(2*half_width+1) + half_width] << '\n';
+    stencil_values[half_width*(2*half_width+1) + half_width] = 1.0f-sum;
 
  }
 

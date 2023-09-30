@@ -74,7 +74,7 @@ class StarterViewer
     const std::string& GetTitle() { return title; }
 
     //! Set the Image
-    void SetImage(const img::ImgProc& img, std::string fileN) {imgProc = img, fileName=fileN;}
+    void SetImage(img::ImgProc* img, std::string fileN) {imgProc = img, fileName=fileN;}
 
     // Callback functions
     //! Cascading callback for initiating a display event
@@ -113,7 +113,7 @@ class StarterViewer
     int mouse_state;
     float current_raster_pos[4];
     
-    img::ImgProc imgProc;
+    img::ImgProc* imgProc;
     std::string fileName;
 
 
