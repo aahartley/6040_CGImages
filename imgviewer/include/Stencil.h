@@ -14,9 +14,9 @@ class Stencil
     float& operator()(int i, int j);
     const float& operator()(int i, int j) const;
 
-   private:
-     int half_width;
-     float *stencil_values;
+  private:
+    int half_width;
+    float *stencil_values;
 };
 
 #endif

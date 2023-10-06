@@ -16,7 +16,6 @@ using namespace img;
 void ImgViewer::run(const int argc, char const* const* argv){
 	StarterViewer* viewer = CreateViewer();
     std::vector<std::string> args;
-
     for(int i=0;i<argc;i++)
     {
        std::string s(argv[i]);

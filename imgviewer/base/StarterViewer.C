@@ -69,6 +69,7 @@ StarterViewer::StarterViewer() :
    title          ( string("Img Viewer") ),
    mouse_x        ( 0 ),
    mouse_y        ( 0 ),
+   imgProc        (nullptr),
    fileName       ("")
 {
    cout << "ImgViewer Loaded\n";
@@ -88,8 +89,12 @@ void StarterViewer::Init( const std::vector<std::string>& args )
    glutInit( &argc, argv );
    string window_title = title;
 
-   if(imgProc->nx()!=0)width=imgProc->nx();
-   if(imgProc->ny()!=0)height=imgProc->ny();
+   if(imgProc != nullptr)
+   {
+      if(imgProc->nx()!=0)width=imgProc->nx();
+      if(imgProc->ny()!=0)height=imgProc->ny();
+   }
+
    if(width > 1300) width = 1300;  //should fit most displays
    if(height> 600) height = 600;
 
@@ -120,14 +125,17 @@ void StarterViewer::MainLoop()
 
 void StarterViewer::Display()
 {
-   //Draw image based off color channels
-   if(imgProc->depth() == 3)
+   if(imgProc != nullptr)
    {
-      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
-   }
-   else
-   {
-      glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGBA,GL_FLOAT, imgProc->raw() );
+      //Draw image based off color channels
+      if(imgProc->depth() == 3)
+      {
+         glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
+      }
+      else
+      {
+         glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGBA,GL_FLOAT, imgProc->raw() );
+      }
    }
 
 }
@@ -153,20 +161,29 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
             write_image(fileName,'j',*imgProc); //write jpg
          break;
       case 'g':{
-         ImgProc out;
-         Gamma(*imgProc, out, 0.9);
-         *imgProc = out;
+         if(imgProc != nullptr)
+         {
+            ImgProc out;
+            Gamma(*imgProc, out, 0.9);
+            *imgProc = out;
+         }
          }break;
       case 'G':{
-         ImgProc out;
-         Gamma(*imgProc, out, 1.111111);
-         *imgProc = out;
+         if(imgProc != nullptr)
+         {
+            ImgProc out;
+            Gamma(*imgProc, out, 1.111111);
+            *imgProc = out;
+         }
          }break;
       case 's':{
-         ImgProc out;
-         Stencil stencil(5);
-         BoundedLinearConvolution(stencil, *imgProc, out);
-         *imgProc = out;
+         if(imgProc != nullptr)
+         {
+            ImgProc out;
+            Stencil stencil(5);
+            BoundedLinearConvolution(stencil, *imgProc, out);
+            *imgProc = out;
+         }
          }break;
       case 'r':
 	      Reset();

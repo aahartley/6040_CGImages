@@ -2,13 +2,13 @@
 
  Stencil::Stencil(int halfwidth)
  {
-    half_width= halfwidth;
+    half_width = halfwidth;
     stencil_values = new float[(2*half_width+1)*(2*half_width+1)];
     const float range_from  = -0.1f;
     const float range_to    = 0.1f;
-    std::random_device                  rand_dev;
-    std::mt19937                        generator(rand_dev());
-    std::uniform_real_distribution<float>  distr(range_from, range_to);
+    std::random_device rand_dev;
+    std::mt19937 generator(rand_dev());
+    std::uniform_real_distribution<float> distr(range_from, range_to);
     float sum =0.f;
     for(int j=0; j<(2*half_width+1);j++)
     {

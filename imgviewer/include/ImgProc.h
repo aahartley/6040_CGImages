@@ -51,10 +51,11 @@ class ImgProc
 	void PeriodicLinearConvolution( const Stencil& stencil, ImgProc& out ) const;
 	void BoundedLinearConvolution( const Stencil& stencil, ImgProc& out ) const;
 	void Gamma(ImgProc& out, float s) const;
-	void GammaInPlace(float s);
+	void Gamma(float s);
 
 	//Affine transformations
 	void Flip();
+	void Flip(const float* data);
 	void Flop();
 
 
@@ -73,12 +74,14 @@ void write_image(std::string fileName, char f, const ImgProc& imgProc);
 
 //Affine transformations
 void Flip(ImgProc& in);
+void Flip(float* in, int Nx, int Ny, int Nc, const float* data, int nx, int ny, int nc);
+
 void Flop(ImgProc& in);
 
 void PeriodicLinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
 void BoundedLinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out );
 void Gamma(const ImgProc& in, ImgProc& out, float s);
-void GammaInPlace(ImgProc& in, float s);
+void Gamma(ImgProc& in, float s);
 
 }
 #endif

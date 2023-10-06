@@ -83,21 +83,7 @@ void ImgProc::set_raw(float* data)
 }
 void ImgProc::set_raw_OI(float* data)
 {
-	if( img_data == nullptr ){ return; }
-
-	#pragma omp parallel for collapse(2)
-	for(int j=0; j<Ny; j++)
-	{
-		for(int i=0; i<Nx; i++)
-		{
-			for(int k=0; k<Nc; k++)
-			{
-				//flip in place
-				img_data[index(i,j,k,Nc,Nx)] = data[index(i,Ny-1-j,k,Nc,Nx)];
-			}
-		}
-
-	}
+	Flip(data);
 	return;
 }
 
@@ -150,17 +136,8 @@ void ImgProc::write_image(std::string fileName, char f) const
 	}
 	std::cout << "Writing: " << nfileName <<'\n';
 
-	for(int j=0; j<yres; j++)
-	{
-		for(int i=0; i<xres; i++)
-		{
-			for(int k=0; k<channels;k++)
-			{
-				//flip in place
-				pixels[index(i,j,k,channels,xres)] = img_data[index(i,Ny-1-j,k,Nc,Nx)];
-			}
-		}
-	}
+	img::Flip(pixels, xres, yres, channels, img_data, Nx, Ny, Nc);
+
 	std::unique_ptr<ImageOutput> out = ImageOutput::create (nfileName);
 	if (! out)
 	{
@@ -183,7 +160,7 @@ void ImgProc::PeriodicLinearConvolution( const Stencil& stencil, ImgProc& out ) 
 		int jmin = j - stencil.halfwidth();
 		int jmax = j + stencil.halfwidth();	
 
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for(int i=0;i<out.nx();i++)
 		{
 			int imin = i - stencil.halfwidth();
@@ -218,6 +195,7 @@ void ImgProc::PeriodicLinearConvolution( const Stencil& stencil, ImgProc& out ) 
 
 void ImgProc::BoundedLinearConvolution( const Stencil& stencil, ImgProc& out ) const
 {
+	std::cout << "Starting Linear Convolution...\n";
 	out.clear( Nx, Ny, Nc );
 	bool outB =false;
 	for( int j=0;j<out.ny();j++)
@@ -225,7 +203,7 @@ void ImgProc::BoundedLinearConvolution( const Stencil& stencil, ImgProc& out ) c
 		int jmin = j - stencil.halfwidth();
 		int jmax = j + stencil.halfwidth();	
 
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for(int i=0;i<out.nx();i++)
 		{
 			int imin = i - stencil.halfwidth();
@@ -260,10 +238,15 @@ void ImgProc::BoundedLinearConvolution( const Stencil& stencil, ImgProc& out ) c
  			out.set_value(i,j,pixel);
  		}
 	}
+	std::cout <<"Finished\n";
 }
 
+//flip in place
 void ImgProc::Flip()
 {
+	if( img_data == nullptr ){ return; }
+
+	#pragma omp parallel for collapse(2)
 	//row to height
 	for(int j=0; j<Ny/2;j++)
 	{
@@ -283,8 +266,33 @@ void ImgProc::Flip()
 
 }
 
+//flip as copying
+void ImgProc::Flip(const float* data)
+{
+	if( img_data == nullptr ){ return; }
+
+	#pragma omp parallel for collapse(2)
+	for(int j=0; j<Ny; j++)
+	{
+		for(int i=0; i<Nx; i++)
+		{
+			for(int k=0; k<Nc; k++)
+			{
+				img_data[index(i,j,k,Nc,Nx)] = data[index(i,Ny-1-j,k,Nc,Nx)];
+			}
+		}
+
+	}
+	return;
+
+}
+
+//flop in place
 void ImgProc::Flop()
 {
+	if( img_data == nullptr ){ return; }
+
+	#pragma omp parallel for collapse(2)
 	//row to height
 	for(int j=0; j<Ny;j++)
 	{
@@ -313,7 +321,8 @@ void ImgProc::Gamma(ImgProc& out, float s) const
  		out.raw()[i] = std::pow(img_data[i], s);
  	}
 }
-void ImgProc::GammaInPlace(float s)
+//in place
+void ImgProc::Gamma(float s)
 {
 	#pragma omp parallel for
  	for(int i=0; i<Nsize; i++)
@@ -355,7 +364,7 @@ ImgProc& ImgProc::operator=(const ImgProc& v)
 
 
 //***************************************************************************************//
-//img namespace function definitions
+//img namespace function definitions  
 
 int img::read_image(const std::string& s, ImgProc& imgProc)
 {
@@ -401,21 +410,22 @@ void img::write_image(std::string fileName, char f, const ImgProc& imgProc)
 		//save new file to the original filepath
 		nfileName = fn+"jpgdemo_"+date+".jpeg";
 	
-		pixels= new float[xres * yres * channels];
+		pixels = new float[xres * yres * channels];
 	}
 	std::cout << "Writing: " << nfileName <<'\n';
-
-	for(int j=0; j<yres; j++)
-	{
-		for(int i=0; i<xres; i++)
-		{
-			for(int k=0; k<channels;k++)
-			{
-				//flip in place
-				pixels[index(i,j,k,channels,xres)] = imgProc.raw()[index(i,imgProc.ny()-1-j,k,imgProc.depth(),imgProc.nx())];
-			}
-		}
-	}
+	Flip(pixels, xres, yres, channels, imgProc.raw(), imgProc.nx(), imgProc.ny(), imgProc.depth());
+	// #pragma omp parallel for collapse(2)
+	// for(int j=0; j<yres; j++)
+	// {
+	// 	for(int i=0; i<xres; i++)
+	// 	{
+	// 		for(int k=0; k<channels;k++)
+	// 		{
+	// 			//flip in place
+	// 			pixels[index(i,j,k,channels,xres)] = imgProc.raw()[index(i,imgProc.ny()-1-j,k,imgProc.depth(),imgProc.nx())];
+	// 		}
+	// 	}
+	// }
 	std::unique_ptr<ImageOutput> out = ImageOutput::create (nfileName);
 	if (! out)
 	{
@@ -437,7 +447,7 @@ void img::PeriodicLinearConvolution( const Stencil& stencil, const ImgProc& in, 
 		int jmin = j - stencil.halfwidth();
 		int jmax = j + stencil.halfwidth();	
 
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for(int i=0;i<out.nx();i++)
 		{
 			int imin = i - stencil.halfwidth();
@@ -471,6 +481,7 @@ void img::PeriodicLinearConvolution( const Stencil& stencil, const ImgProc& in, 
 }
 void img::BoundedLinearConvolution( const Stencil& stencil, const ImgProc& in, ImgProc& out )
 {
+	std::cout << "Starting Linear Convolution...\n";
 	out.clear( in.nx(), in.ny(), in.depth() );
 	bool outB =false;
 	for( int j=0;j<out.ny();j++)
@@ -488,7 +499,6 @@ void img::BoundedLinearConvolution( const Stencil& stencil, const ImgProc& in, I
 			for(int jj=jmin;jj<=jmax;jj++)
 			{
 				int stencilj = jj-j;
-				//std::cout << stencilj << '\n';
 				int jjj = jj;
 				if(jjj <0 || jjj>= out.ny()){outB=true;}
 	
@@ -514,6 +524,8 @@ void img::BoundedLinearConvolution( const Stencil& stencil, const ImgProc& in, I
  			out.set_value(i,j,pixel);
  		}
 	}
+	std::cout <<"Finished\n";
+
 }
 
 void img::Gamma(const ImgProc& in, ImgProc& out, float s)
@@ -526,7 +538,8 @@ void img::Gamma(const ImgProc& in, ImgProc& out, float s)
  		out.raw()[i] = std::pow(in.raw()[i], s);
  	}
 }
-void img::GammaInPlace(ImgProc& in, float s)
+//in place
+void img::Gamma(ImgProc& in, float s)
 {
 	#pragma omp parallel for
  	for( int i=0;i<in.size();i++ )
@@ -537,6 +550,7 @@ void img::GammaInPlace(ImgProc& in, float s)
 //in place
 void img::Flip(ImgProc& in)
 {
+	#pragma omp parallel for collapse(2)
 	//row to height
 	for(int j=0; j<in.ny()/2;j++)
 	{
@@ -556,9 +570,27 @@ void img::Flip(ImgProc& in)
 	}
 
 }
+//flip while copying
+void img::Flip(float* in, int Nx, int Ny, int Nc, const float* data, int nx, int ny, int nc)
+{
+	#pragma omp parallel for collapse(2)
+	for(int j=0; j<Ny; j++)
+	{
+		for(int i=0; i<Nx; i++)
+		{
+			for(int k=0; k<Nc;k++)
+			{
+				//flip in place
+				in[index(i,j,k,Nc,Nx)] = data[index(i,ny-1-j,k,nc,nx)];
+			}
+		}
+	}
+
+}
 //in place
 void img::Flop(ImgProc& in)
 {
+	#pragma omp parallel for collapse(2)
 	//row to height
 	for(int j=0; j<in.ny();j++)
 	{
