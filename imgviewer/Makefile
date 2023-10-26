@@ -3,9 +3,10 @@
 OFILES = \
          base/Matrix.o \
          base/LinearAlgebra.o \
-	 	 base/StarterViewer.o \
 		 base/ImgProc.o \
-		 base/Stencil.o \
+		 base/ImageProcessing.o\
+		 base/Mandelbrot.o\
+		 base/StarterViewer.o \
 		 base/ImgViewer.o \
 
 		  

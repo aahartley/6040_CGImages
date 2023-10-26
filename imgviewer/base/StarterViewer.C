@@ -81,7 +81,7 @@ void StarterViewer::Init( const std::vector<std::string>& args )
 {
    int argc = (int)args.size();
    char** argv = new char*[argc];
-   for( int i=0;i<argc;i++)
+   for(int i = 0; i < argc; i++)
    {
       argv[i] = new char[args[i].length() + 1];
       std::strcpy(argv[i], args[i].c_str());
@@ -91,8 +91,8 @@ void StarterViewer::Init( const std::vector<std::string>& args )
 
    if(imgProc != nullptr)
    {
-      if(imgProc->nx()!=0)width=imgProc->nx();
-      if(imgProc->ny()!=0)height=imgProc->ny();
+      if(imgProc->nx() != 0) width=imgProc->nx();
+      if(imgProc->ny() != 0) height=imgProc->ny();
    }
 
    if(width > 1300) width = 1300;  //should fit most displays
@@ -156,27 +156,44 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
    switch (key)
    {
       case 'j':
-      case 'J':
-         if(fileName!="") //dont allow writing unless image has been found
+         if(fileName != "" && imgProc != nullptr) //dont allow writing unless image has been found
             write_image(fileName,'j',*imgProc); //write jpg
          break;
-      case 'g':{
+      case 'J':
+         {
+         if(imgProc != nullptr)
+         {
+            Point center(0.03811, 0.01329);
+            Point zc(0.8*cos(254.3 * 3.14159265/180.0), 0.8*sin(254.3 * 3.14159265/180.0));
+            double range = 1.0e-6;
+            JuliaSet julia(zc, 500, 2); //zc, iterations, cycles
+            ColorLUT lut{};
+            ApplyFractalWarpLUT(center, range, julia, lut, *imgProc);     
+         }
+         }
+         break;
+      case 'g':
+         {
          if(imgProc != nullptr)
          {
             ImgProc out;
             Gamma(*imgProc, out, 0.9);
             *imgProc = out;
          }
-         }break;
-      case 'G':{
+         }
+         break;
+      case 'G':
+         {
          if(imgProc != nullptr)
          {
             ImgProc out;
             Gamma(*imgProc, out, 1.111111);
             *imgProc = out;
          }
-         }break;
-      case 's':{
+         }
+         break;
+      case 's':
+         {
          if(imgProc != nullptr)
          {
             ImgProc out;
@@ -184,7 +201,8 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
             BoundedLinearConvolution(stencil, *imgProc, out);
             *imgProc = out;
          }
-         }break;
+         }
+         break;
       case 'r':
 	      Reset();
          break;
@@ -233,7 +251,11 @@ void StarterViewer::Usage()
    cout << "--------------------------------------------------------------\n";
    cout << "ImgViewer usage: -image <image.ext>  loads images\n";
    cout << "--------------------------------------------------------------\n";
-   cout << "j/J           write image to JPEG/JPG\n";
+   cout << "j           Write image to JPEG/JPG\n";
+   cout << "s           Apply Bounded Linear Convolution\n";
+   cout << "g           Apply gamma (lightens)\n";
+   cout << "G           Apply gamma (darkens)\n";
+   cout << "J           Draws the Mandelbrot Julia Set\n";
    cout << "--------------------------------------------------------------\n";
 }
 

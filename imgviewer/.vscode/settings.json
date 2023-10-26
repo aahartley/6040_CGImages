@@ -72,7 +72,12 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "Stencil.C": "cpp"
+        "Stencil.C": "cpp",
+        "set": "cpp",
+        "Img.C": "cpp",
+        "Mandelbrot.C": "cpp",
+        "complex": "cpp",
+        "ImageProcessing.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

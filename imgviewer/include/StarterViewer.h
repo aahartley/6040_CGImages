@@ -30,7 +30,8 @@
 #include <GL/glut.h> // GLUT support library.
 
 #include "ImgProc.h"
-
+#include "ImageProcessing.h"
+#include "Mandelbrot.h"
 
 namespace starter{
 
