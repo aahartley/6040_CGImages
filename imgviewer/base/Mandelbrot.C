@@ -3,25 +3,47 @@
 using namespace img;
 
 
-ColorLUT::ColorLUT()
+ColorLUT::ColorLUT(int chan, const double gam)
 {
-    gamma = 1.0;
-    black = std::vector<float>(3);
-    black[0] = black[1] = black[2] = 0;
+    //minimum channels allowed is 3
+    if(chan < 3)
+    { 
+        std::cout << "Look-up table requires 3 channels. It has been set to 3 by default\n";
+        chan = 3;
+    }
+    channels = chan;
+    gamma = gam;
+    black = std::vector<float>(channels);
+    generate_color(black, 0, 0, 0);
 
-    //init colors and set uint8 for float value 0-1
+    
     bands = std::vector< std::vector<float> >(5);
-    std::vector<float> color {255/(float)0xFF, 230/(float)0xFF, 255/(float)0xFF};
+    std::vector<float> color(channels);
+    generate_color(color, 255, 230, 255);
     bands[0] = color;
-    color = {5/(float)0xFF, 102/(float)0xFF, 153/(float)0xFF};
+    generate_color(color, 5, 102, 153); 
     bands[1] = color;
-    color = {255/(float)0xFF, 179/(float)0xFF, 255/(float)0xFF};
+    generate_color(color, 255, 179, 255);
     bands[2] = color;
-    color = {77/(float)0xFF, 38/(float)0xFF, 0/(float)0xFF};
+    generate_color(color, 77, 38, 0); 
     bands[3] = color;
-    color = {255/(float)0xFF, 153/(float)0xFF, 255/(float)0xFF};
+    generate_color(color, 255, 153, 255); 
     bands[4] = color;
 
+}
+
+void ColorLUT::generate_color(std::vector<float>& color, const uint8_t r, const uint8_t g, const uint8_t b) const
+{
+    //init colors and convert uint8 t0 float value 0-1
+    color[0] = std::pow(r/(float)0xFF, gamma);
+    color[1] = std::pow(g/(float)0xFF, gamma);
+    color[2] = std::pow(b/(float)0xFF, gamma);
+    // set alpha and other channels to 1
+    for(int i = 3; i < channels; i++)
+    {
+        color[i] = 1;
+    }
+  
 }
 
 void ColorLUT::operator()(const double& value, std::vector<float>& C) const
@@ -41,13 +63,17 @@ void ColorLUT::operator()(const double& value, std::vector<float>& C) const
         {
             mPrime = m;
         }
-
-        for(size_t i = 0; i < C.size(); i++)
+        //doesnt alter alpha/4+ channels
+        for(int i = 0; i < 3; i++)
         {
-  
+            //linear interpolation
             C[i] = (bands[m][i] * (1-weight)) + (bands[mPrime][i] * weight);
         }
- 
+        //this is needed for depth check in imgProc.set_Value() 
+        for(int i = 3; i < channels; i++)
+        {
+            C[i] = bands[m][i]; //sets to 1, future calculations can also be done
+        }
     }
 }
 
@@ -96,7 +122,7 @@ void img::ApplyFractalWarpLUT( const Point& center, const double range, const Wa
             P.y += center.y;
             Point PP = w(P);
             double rate = std::sqrt(PP.x*PP.x + PP.y*PP.y)/R;
-            std::vector<float> v(3,0.0);
+            std::vector<float> v(out.depth(),0.0);
             lut(rate,v);
             out.set_value(i, j, v);
         }

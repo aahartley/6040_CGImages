@@ -160,47 +160,40 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
             write_image(fileName,'j',*imgProc); //write jpg
          break;
       case 'J':
-         {
          if(imgProc != nullptr)
          {
             Point center(0.03811, 0.01329);
-            Point zc(0.8*cos(254.3 * 3.14159265/180.0), 0.8*sin(254.3 * 3.14159265/180.0));
             double range = 1.0e-6;
+            Point zc(0.8*cos(254.3 * 3.14159265/180.0), 0.8*sin(254.3 * 3.14159265/180.0));
             JuliaSet julia(zc, 500, 2); //zc, iterations, cycles
-            ColorLUT lut{};
+            //pass depth to allow 3+ channels imgProc to get correct values for lut
+            ColorLUT lut(imgProc->depth(), 1.0); // depth, gamma
             ApplyFractalWarpLUT(center, range, julia, lut, *imgProc);     
-         }
          }
          break;
       case 'g':
-         {
          if(imgProc != nullptr)
          {
             ImgProc out;
             Gamma(*imgProc, out, 0.9);
             *imgProc = out;
          }
-         }
          break;
       case 'G':
-         {
          if(imgProc != nullptr)
          {
             ImgProc out;
             Gamma(*imgProc, out, 1.111111);
             *imgProc = out;
          }
-         }
          break;
       case 's':
-         {
          if(imgProc != nullptr)
          {
             ImgProc out;
             Stencil stencil(5);
             BoundedLinearConvolution(stencil, *imgProc, out);
             *imgProc = out;
-         }
          }
          break;
       case 'r':

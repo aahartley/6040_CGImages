@@ -21,14 +21,18 @@ namespace img
 class ColorLUT
 {
 public:
-    ColorLUT();
+    //don't allow default constructor
+    ColorLUT(int chan, const double gam);
     ~ColorLUT(){}
   
+    void generate_color(std::vector<float>& color, const uint8_t r, const uint8_t g, const uint8_t b) const;
+
     // Generate color value from the input value
     void operator()(const double& value, std::vector<float>& C) const;
   
 private:  
     double gamma;
+    int channels;
     std::vector<float> black;
     std::vector< std::vector<float> > bands;
 };  
@@ -37,6 +41,7 @@ private:
 class JuliaSet : public Warp
 {
 public:
+    //don't allow default constructor
     JuliaSet(const Point& P0, const int nb, const int cycle);
     ~JuliaSet(){}
     
