@@ -104,6 +104,25 @@ void StarterViewer::Init( const std::vector<std::string>& args )
    glClearColor(0.5,0.5,0.6,0.0);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //enable transparency
    glEnable( GL_BLEND );
+
+   glEnable(GL_TEXTURE_2D);
+
+   // Generate a texture ID
+   glGenTextures(1, &textureID);
+
+   // Bind the texture ID
+   glBindTexture(GL_TEXTURE_2D, textureID);
+
+   // Set texture parameters
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glMatrixMode(GL_PROJECTION); 
+   glLoadIdentity();
+   glOrtho(0, width, 0, height, -1, 1);
+   glMatrixMode(GL_MODELVIEW); 
+
    glutDisplayFunc( &cbDisplayFunc );
    glutIdleFunc( &cbIdleFunc );
    glutKeyboardFunc( &cbKeyboardFunc );
@@ -130,11 +149,29 @@ void StarterViewer::Display()
       //Draw image based off color channels
       if(imgProc->depth() == 3)
       {
-         glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
+         //glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGB, GL_FLOAT, imgProc->raw() );
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgProc->nx(), imgProc->ny(),0, GL_RGB, GL_FLOAT, imgProc->raw());
+         glBindTexture(GL_TEXTURE_2D, textureID);
+         glBegin(GL_QUADS);
+         glTexCoord2i(0, 0); glVertex2i(0, 0);
+         glTexCoord2i(0, 1); glVertex2i(0, height);
+         glTexCoord2i(1, 1); glVertex2i(width, height);
+         glTexCoord2i(1, 0); glVertex2i(width, 0);
+         glEnd();
+
       }
       else
       {
          glDrawPixels( imgProc->nx(), imgProc->ny(), GL_RGBA,GL_FLOAT, imgProc->raw() );
+         // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgProc->nx(), imgProc->ny(),0, GL_RGBA, GL_FLOAT, imgProc->raw());
+         // glBindTexture(GL_TEXTURE_2D, textureID);
+         // glBegin(GL_QUADS);
+         // glTexCoord2i(0, 0); glVertex2i(0, 0);
+         // glTexCoord2i(0, 1); glVertex2i(0, height);
+         // glTexCoord2i(1, 1); glVertex2i(width, height);
+         // glTexCoord2i(1, 0); glVertex2i(width, 0);
+         // glEnd();
+
       }
    }
 
@@ -146,9 +183,11 @@ void StarterViewer::Reshape( int w, int h )
 {
    width = w;
    height = h;
-   //glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
-   //glMatrixMode( GL_PROJECTION );
-   //glLoadIdentity();
+   glViewport( 0, 0, (GLsizei) width, (GLsizei) height );
+   glMatrixMode(GL_PROJECTION); 
+   glLoadIdentity();
+   glOrtho(0, width, 0, height, -1, 1);
+   glMatrixMode(GL_MODELVIEW); 
 }
 
 void StarterViewer::Keyboard( unsigned char key, int x, int y )
@@ -193,6 +232,22 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
             ImgProc out;
             Stencil stencil(5);
             BoundedLinearConvolution(stencil, *imgProc, out);
+            *imgProc = out;
+         }
+         break;
+      case 'C':
+         if(imgProc != nullptr)
+         {
+            ImgProc out;
+            ContrastUnits(*imgProc, out);
+            *imgProc = out;
+         }
+         break;
+      case 'H':
+         if(imgProc != nullptr)
+         {
+            ImgProc out;
+            Histogram(*imgProc, out, 500);
             *imgProc = out;
          }
          break;

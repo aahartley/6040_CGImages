@@ -32,6 +32,7 @@
 #include "ImgProc.h"
 #include "ImageProcessing.h"
 #include "Mandelbrot.h"
+#include "ImageStatistics.h"
 
 namespace starter{
 
@@ -117,6 +118,7 @@ class StarterViewer
     img::ImgProc* imgProc;
     std::string fileName;
 
+   GLuint textureID;
 
     static StarterViewer* pStarterViewer;
 

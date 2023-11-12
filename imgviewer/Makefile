@@ -6,6 +6,7 @@ OFILES = \
 		 base/ImgProc.o \
 		 base/ImageProcessing.o\
 		 base/Mandelbrot.o\
+		 base/ImageStatistics.o\
 		 base/StarterViewer.o \
 		 base/ImgViewer.o \
 

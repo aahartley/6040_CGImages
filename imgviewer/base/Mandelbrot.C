@@ -8,7 +8,7 @@ ColorLUT::ColorLUT(int chan, const double gam)
     //minimum channels allowed is 3
     if(chan < 3)
     { 
-        std::cout << "Look-up table requires 3 channels. It has been set to 3 by default\n";
+        std::cout << "Look-up table requires at least 3 channels. It has been set to 3 by default\n";
         chan = 3;
     }
     channels = chan;
