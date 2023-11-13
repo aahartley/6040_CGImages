@@ -2,40 +2,9 @@
 
 using namespace img;
 
-void img::ContrastUnits(const ImgProc& in, ImgProc& out)
+float img::calcAvgColorChannel(int channel, const ImgProc& in)
 {
-    out.clear(in.nx(), in.ny(), in.depth());
-    
-    std::vector<double> avgColorChannel(in.depth());
-    for(int i = 0; i < in.depth(); i++)
-    {
-        avgColorChannel[i] = CalcAvgColorChannel(i, in);
-    }
-
-    std::vector<double> covariance(in.depth());
-    for( int i = 0; i < in.depth(); i++)
-    {
-        covariance[i] = CalcCovarianceColorChannel(i, i, avgColorChannel, in);
-    }
-    //convert to contrast units delta C_aij/rms
-    for(int j = 0; j < in.ny(); j++)
-    {
-        for(int i = 0; i < in.nx(); i++)
-        {
-            for(int c = 0; c < in.depth(); c++)
-            {
-                if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; //so alpha channel doesnt stop img from being seen
-                else
-                    out.raw()[index(i, j, c, in.depth(), in.nx())] = (in.raw()[index(i, j, c, in.depth(), in.nx())] - avgColorChannel[c]) / std::sqrt(covariance[c]);
-            }
-        }
-    }
-
-}
-
-double img::CalcAvgColorChannel(int channel, const ImgProc& in)
-{
-    double avgColorA = 0;
+    float avgColorA = 0;
     for(int j = 0; j < in.ny(); j++)
     {
         for(int i = 0; i < in.nx(); i++)
@@ -47,15 +16,15 @@ double img::CalcAvgColorChannel(int channel, const ImgProc& in)
     return avgColorA;
 }
 
-double img::CalcCovarianceColorChannel(int channelA, int channelB, std::vector<double>& avgs, const ImgProc& in)
+float img::calcCovarianceColorChannel(int channelA, int channelB, std::vector<float>& avgs, const ImgProc& in)
 {
-    double covariance = 0;
+    float covariance = 0;
     for(int j = 0; j < in.ny(); j++)
     {
         for(int i = 0; i < in.nx(); i++)
         {
-            double fluctA = in.raw()[index(i, j, channelA, in.depth(), in.nx())] - avgs[channelA];
-            double fluctB = in.raw()[index(i, j, channelB, in.depth(), in.nx())] - avgs[channelB];
+            float fluctA = in.raw()[index(i, j, channelA, in.depth(), in.nx())] - avgs[channelA];
+            float fluctB = in.raw()[index(i, j, channelB, in.depth(), in.nx())] - avgs[channelB];
 
             covariance += fluctA * fluctB;
         }
@@ -64,105 +33,170 @@ double img::CalcCovarianceColorChannel(int channelA, int channelB, std::vector<d
     return covariance;
 }
 
-void img::Histogram(const ImgProc& in, ImgProc& out, int num_bins)
+void img::ContrastUnits(const ImgProc& in, ImgProc& out)
+{
+    out.clear(in.nx(), in.ny(), in.depth());
+    
+    std::vector<float> avgColorChannels(in.depth());
+    for(int i = 0; i < in.depth(); i++)
+    {
+        avgColorChannels[i] = calcAvgColorChannel(i, in);
+    }
+
+    std::vector<float> covariances(in.depth());
+    for( int i = 0; i < in.depth(); i++)
+    {
+        covariances[i] = calcCovarianceColorChannel(i, i, avgColorChannels, in);
+    }
+    //convert to contrast units delta C_aij/rms
+    for(int j = 0; j < in.ny(); j++)
+    {
+        for(int i = 0; i < in.nx(); i++)
+        {
+            for(int c = 0; c < in.depth(); c++)
+            {
+                if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; //so alpha channel doesnt stop img from being seen
+                else
+                    out.raw()[index(i, j, c, in.depth(), in.nx())] = (in.raw()[index(i, j, c, in.depth(), in.nx())] - avgColorChannels[c]) / std::sqrt(covariances[c]);
+            }
+        }
+    }
+
+}
+
+
+
+
+void img::calcMinMaxWidthColorChannel(int channel, int num_bins, std::vector<float>& e_mmw, const ImgProc& in)
+{
+    e_mmw[0] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
+    e_mmw[1] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
+    for(int j = 0; j < in.ny(); j++)
+    {
+        for(int i = 0; i < in.nx(); i++)
+        {
+            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] < e_mmw[0]) 
+                e_mmw[0] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
+
+            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] > e_mmw[1])
+                 e_mmw[1] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
+
+            if(e_mmw[0] == 0 && e_mmw[1] == 1) break;
+        }
+        if(e_mmw[0] == 0 && e_mmw[1] == 1) break;
+    }
+    e_mmw[2] = (e_mmw[1] - e_mmw[0]) / num_bins;
+
+}
+
+void img::calcHistogramColorChannel(int channel, int num_bins, std::vector<float>& histogram, const std::vector<float>& e_mmw, const ImgProc& in)
+{
+    for(int j = 0; j < in.ny(); j++)
+    {
+        for(int i = 0; i < in.nx(); i++)
+        {
+            int bin_i = int((in.raw()[index(i, j, channel, in.depth(), in.nx())] - e_mmw[0]) / e_mmw[2]);
+            if(bin_i >= 0 && bin_i < num_bins) histogram[bin_i] += 1;
+        }
+    }
+}
+
+void img::calcPDFColorChannel(int channel, int num_bins, std::vector<float>& pdf, const std::vector<float>& histogram)
+{
+    float hist_total = 0;
+    for(int i = 0; i < num_bins; i++)
+    {
+        hist_total += histogram[i];
+    }
+    //normalize
+    for(int i = 0; i < num_bins; i++)
+    {
+        pdf[i] = histogram[i] / hist_total;
+    }
+}
+
+void img::calcCDFColorChannel(int channel, int num_bins, std::vector<float>& cdf, const std::vector<float>& pdf)
+{
+    for(int j = 0; j <= num_bins; j++)
+    {
+        for(int i = 0; i < j; i++)
+        {
+            cdf[j] += pdf[i];
+        }
+    }
+}
+
+void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
 {
     out.clear(in.nx(), in.ny(), in.depth());
 
-    std::vector< std::vector<double> > e_min_max(in.depth());
-    std::vector<double> e_widths(in.depth());
-    for(int i = 0; i < in.depth(); i++)
-    {
-        e_min_max[i] = CalcMinMaxColorChannel(i, in);
-        // std::cout << e_min_max[i][0] << ' ' << e_min_max[i][1] << '\n';
-
-        e_widths[i] = (e_min_max[i][1] - e_min_max[i][0]) / num_bins;
-    }
-    std::vector< std::vector<double> > histograms(in.depth());
+    std::vector< std::vector<float> > e_mmws(in.depth());
+    std::vector<float> e_mmw(3);
     for(int k = 0; k < in.depth(); k++)
     {
-        std::vector<double> histogram(num_bins, 0);
+        calcMinMaxWidthColorChannel(k, num_bins, e_mmw, in); 
+        e_mmws[k] = e_mmw;
+        //no need to clear e_mmw
+        std::cout << "min max" << k << ": " << e_mmws[k][0] << ' ' << e_mmws[k][1] << '\n';
+    }
 
-        for(int j = 0; j < in.ny(); j++)
-        {
-            for(int i = 0; i < in.nx(); i++)
-            {
-                int bin_i = int((in.raw()[index(i, j, k, in.nx(), in.ny())] - e_min_max[k][0]) / e_widths[k]);
-                if(bin_i == 500) bin_i = 499;
-                if(bin_i >= 0 && bin_i < num_bins) histogram[bin_i] += 1;
-                else std::cout << bin_i << '\n';
-            }
-        }
+    std::vector< std::vector<float> > histograms(in.depth());
+    std::vector<float> histogram(num_bins, 0);
+    for(int k = 0; k < in.depth(); k++)
+    {
+        calcHistogramColorChannel(k, num_bins, histogram, e_mmws[k], in);
         histograms[k] = histogram;
-    }
-    std::vector<double> hist_totals(in.depth(), 0);
-    std::vector< std::vector<double> > pdf(in.depth());
-    for(int j = 0; j < in.depth(); j++)
-    {
-        for(int i = 0; i < num_bins; i++)
-        {
-            hist_totals[j] += histograms[j][i];
-        }
-        //normalize
-        pdf[j] = std::vector<double>(num_bins,0);
-
-        for(int i = 0; i < num_bins; i++)
-        {
-            pdf[j][i] = histograms[j][i] / hist_totals[j];
-           // std::cout << pdf[j][i] << '\n';
-        }
-    
+        std::fill(histogram.begin(), histogram.end(), 0);
     }
 
-    std::vector< std::vector<double> > cdf(in.depth());
+    std::vector< std::vector<float> > pdfs(in.depth());
+    std::vector<float> pdf(num_bins,0);
     for(int k = 0; k < in.depth(); k++)
     {
-        cdf[k] = std::vector<double>(num_bins,0);
-
-        for(int j = 0; j < num_bins; j++)
-        {
-            for(int i = 0; i < j; i++)
-            {
-                cdf[k][j] += pdf[k][i];
-            }
-        }
-        // std::cout << "pdf: " << pdf[0][0] << '\n';
-        // std::cout << cdf[0][0] << ' ' << cdf[0][1] << ' ' << cdf[0][num_bins-1] << '\n';
+        calcPDFColorChannel(k, num_bins, pdf, histograms[k]);
+        pdfs[k] = pdf;
+        std::fill(pdf.begin(), pdf.end(), 0);
     }
+    // for(int k =0; k < in.depth(); k++)
+    // {
+    //     float test = 0;
 
+    //     for(int i = 0; i < num_bins; i++)
+    //     {
+    //         test += pdfs[k][i]; 
+    //     }
+    //     std::cout << "test" << k << " : " << test << '\n';
+
+    // }
+    std::vector< std::vector<float> > cdfs(in.depth());
+    std::vector<float> cdf(num_bins+1, 0);
     for(int k = 0; k < in.depth(); k++)
     {
-        for(int j = 0; j < in.ny(); j++)
-        {
-            for(int i = 0; i < in.nx(); i++)
-            {
-                int bin_i = int((in.raw()[index(i, j, k, in.depth(), in.nx())] - e_min_max[k][0]) / e_widths[k]);
-                if(bin_i == 500) bin_i = 499;
+        calcCDFColorChannel(k, num_bins, cdf, pdfs[k]);
+        cdfs[k] = cdf;
+        std::fill(cdf.begin(), cdf.end(), 0);
+        std::cout << "pdf[" << k << "][0]: " << pdfs[k][0] << '\n';
+        std::cout << "cdf["<< k << "] "  << cdfs[k][0]<< ' ' << cdfs[k][1] << ' ' << cdfs[k][num_bins] << '\n';
+    }
 
-                if(bin_i >= 0 && bin_i < num_bins) 
-                    out.raw()[index(i, j, k, in.depth(), in.nx())] = cdf[k][bin_i];
-                else{
-                    out.raw()[index(i, j, k, in.depth(), in.nx())] = in.raw()[index(i, j, k, in.depth(), in.nx())];
-                    std::cout << "what to do \n";
+   //replace C_kij with cdf_kbin_i
+    for(int j = 0; j < in.ny(); j++)
+    {
+        for(int i = 0; i < in.nx(); i++)
+        {
+            for(int c = 0; c < in.depth(); c++)
+            {
+                if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; // so OpenGL doesnt erase image b/c of alpha
+                else
+                {
+                    int bin_i = int((in.raw()[index(i, j, c, in.depth(), in.nx())] - e_mmws[c][0]) / e_mmws[c][2]);
+                    if(bin_i >= 0 && bin_i < num_bins) 
+                        out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][bin_i];
                 }
             }
         }
     }
 
 }
-// pass vector instead?
-std::vector<double> img::CalcMinMaxColorChannel(int channel, const ImgProc& in)
-{
-    std::vector<double> e_min_max(2);
-    e_min_max[0] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
-    e_min_max[1] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
-    for(int j = 0; j < in.ny(); j++)
-    {
-        for(int i = 0; i < in.nx(); i++)
-        {
-            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] < e_min_max[0]) e_min_max[0] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
-            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] > e_min_max[1]) e_min_max[1] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
-            if(e_min_max[0] == 0 && e_min_max[1] == 1) return e_min_max;
-        }
-    }
-    return e_min_max;
-}
+
+

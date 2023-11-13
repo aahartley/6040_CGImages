@@ -119,20 +119,32 @@ void ImgProc::write_image(std::string fileName, char f) const
 	int yres = Ny;
 	int channels = 0;
 	float* pixels = nullptr;
+
 	std::string nfileName;
+	std::size_t pos = fileName.find(".");
+    std::string fn = fileName.substr(0, pos);
+	time_t now = time(0);
+  	std::string date = ctime(&now);
+	std::replace(date.begin(), date.end(), ':', '_');
+	std::replace(date.begin(), date.end(), ' ', '_');
+	date.pop_back();
+
 	if(f =='j') ///jpg
 	{
-		channels=3;
-		std::size_t pos = fileName.find(".");
-    	std::string fn = fileName.substr(0,pos);
-		time_t now = time(0);
-  		std::string date = ctime(&now);
-		std::replace(date.begin(), date.end(), ' ', '_');
+		channels = 3;
 		//save new file to the original filepath
-		nfileName = fn+"jpgdemo_"+date+".jpeg";
-	
-		pixels= new float[xres * yres * channels];
+		nfileName = fn + "jpgdemo_" + date + ".jpeg";
+
 	}
+	else if(f == 'o') //exr
+	{
+		channels = Nc;
+		nfileName = fn + "exrdemo_" + date + ".exr";
+	}
+	else return;
+
+	pixels= new float[xres * yres * channels];
+
 	std::cout << "Writing: " << nfileName <<'\n';
 
 	img::Flip(img_data, Nx, Ny, Nc, pixels, xres, yres, channels);
@@ -140,7 +152,7 @@ void ImgProc::write_image(std::string fileName, char f) const
 	std::unique_ptr<ImageOutput> out = ImageOutput::create (nfileName);
 	if (! out)
 	{
-		std::cout<< "Write error\n";
+		std::cout<< "Write error \n";
     	return;
 	}
 	ImageSpec spec(xres, yres, channels, TypeDesc::FLOAT); 
@@ -289,20 +301,31 @@ void img::write_image(std::string fileName, char f, const ImgProc& imgProc)
 	int yres = imgProc.ny();
 	int channels = 0;
 	float* pixels = nullptr;
+
 	std::string nfileName;
+	std::size_t pos = fileName.find(".");
+    std::string fn = fileName.substr(0,pos);
+	time_t now = time(0);
+  	std::string date = ctime(&now);
+	std::replace(date.begin(), date.end(), ' ', '_');
+	std::replace(date.begin(), date.end(), ':', '_');
+	date.pop_back();
 	if(f == 'j') ///jpg
 	{
 		channels=3;
-		std::size_t pos = fileName.find(".");
-    	std::string fn = fileName.substr(0,pos);
-		time_t now = time(0);
-  		std::string date = ctime(&now);
-		std::replace(date.begin(), date.end(), ' ', '_');
 		//save new file to the original filepath
-		nfileName = fn+"jpgdemo_"+date+".jpeg";
+		nfileName = fn + "jpgdemo_" + date + ".jpeg";
 	
-		pixels = new float[xres * yres * channels];
 	}
+	else if(f == 'o')
+	{
+		channels = imgProc.depth();
+		nfileName = fn + "exrdemo_" + date + ".exr";
+	}
+	else return;
+
+	pixels = new float[xres * yres * channels];
+
 	std::cout << "Writing: " << nfileName <<'\n';
 	Flip(imgProc.raw(), imgProc.nx(), imgProc.ny(), imgProc.depth(), pixels, xres, yres, channels);
 

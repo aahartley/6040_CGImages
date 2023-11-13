@@ -9,13 +9,15 @@
 namespace img
 {
 
+float calcAvgColorChannel(int channel, const ImgProc& in);
+float calcCovarianceColorChannel(int channelA, int channelB, std::vector<float>& avgs, const ImgProc& in);
 void ContrastUnits(const ImgProc& in, ImgProc& out);
 
-double CalcAvgColorChannel(int channel, const ImgProc& in);
-double CalcCovarianceColorChannel(int channelA, int channelB, std::vector<double>& avgs, const ImgProc& in);
-
-void Histogram(const ImgProc& in, ImgProc& out, int bins);
-std::vector<double> CalcMinMaxColorChannel(int channel, const ImgProc& in);
+void calcCDFColorChannel(int channel, int num_bins, std::vector<float>& cdf, const std::vector<float>& pdf);
+void calcPDFColorChannel(int channel, int num_bins, std::vector<float>& pdf, const std::vector<float>& histogram);
+void calcHistogramColorChannel(int channel, int num_bins, std::vector<float>& histogram, const std::vector<float>& e_mmw, const ImgProc& in);
+void calcMinMaxWidthColorChannel(int channel, int num_bins, std::vector<float>& e_mmw, const ImgProc& in);
+void HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins);
 
 }
 

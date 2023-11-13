@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <regex>
 #include <algorithm>
 #include <ctime>
 
