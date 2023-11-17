@@ -127,7 +127,7 @@ void ImgProc::write_image(std::string fileName, char f) const
   	std::string date = ctime(&now);
 	std::replace(date.begin(), date.end(), ':', '_');
 	std::replace(date.begin(), date.end(), ' ', '_');
-	date.pop_back();
+	date.pop_back(); //remove weird character at the end
 
 	if(f =='j') ///jpg
 	{
@@ -309,7 +309,7 @@ void img::write_image(std::string fileName, char f, const ImgProc& imgProc)
   	std::string date = ctime(&now);
 	std::replace(date.begin(), date.end(), ' ', '_');
 	std::replace(date.begin(), date.end(), ':', '_');
-	date.pop_back();
+	date.pop_back(); // remove weird character at the end
 	if(f == 'j') ///jpg
 	{
 		channels=3;

@@ -118,7 +118,8 @@ class StarterViewer
     img::ImgProc* imgProc;
     std::string fileName;
 
-   GLuint textureID;
+    GLuint textureID;
+    float zoom_x, zoom_y;
 
     static StarterViewer* pStarterViewer;
 
