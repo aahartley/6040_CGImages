@@ -78,7 +78,10 @@
         "Mandelbrot.C": "cpp",
         "complex": "cpp",
         "ImageProcessing.C": "cpp",
-        "ImageStatistics.C": "cpp"
+        "ImageStatistics.C": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

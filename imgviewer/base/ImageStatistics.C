@@ -86,9 +86,7 @@ void img::calcMinMaxWidth(int channel, int num_bins, std::vector<float>& e_mmw, 
             if(in.raw()[index(i, j, channel, in.depth(), in.nx())] > e_mmw[1])
                  e_mmw[1] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
 
-            if(e_mmw[0] == 0 && e_mmw[1] == 1) break; //remove this if images are not 0-1
         }
-        if(e_mmw[0] == 0 && e_mmw[1] == 1) break;
     }
     //width
     e_mmw[2] = (e_mmw[1] - e_mmw[0]) / num_bins;
@@ -102,11 +100,16 @@ void img::calcHistogram(int channel, int num_bins, std::vector<float>& histogram
         for(int i = 0; i < in.nx(); i++)
         {
             //[0 - num_bins-1], bins are [0, 1), [1, 2), ...., [num_bins-1, num_bins)
-            int bin_i = int((in.raw()[index(i, j, channel, in.depth(), in.nx())] - e_mmw[0]) / e_mmw[2]);
-            //exclude the right bin edge for bin_numbins-1, i.e there is no overflow bin for values = or > max
-            if(bin_i >= 0 && bin_i < num_bins) histogram[bin_i] += 1;
+            //i.e, max value does not go into last bin for this implementation, bin_i with max value = num_bins
+            // bin_i is susceptible to floating point error, max value can round down to be num_bins-1
+            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] != e_mmw[1])//avoid floating point error & / 0
+            {
+                int bin_i = int((in.raw()[index(i, j, channel, in.depth(), in.nx())] - e_mmw[0]) / e_mmw[2]);
+                if(bin_i >= 0 && bin_i < num_bins){ histogram[bin_i] += 1;}
+            }
         }
     }
+  
 }
 
 void img::calcPDF(int channel, int num_bins, std::vector<float>& pdf, const std::vector<float>& histogram)
@@ -116,6 +119,7 @@ void img::calcPDF(int channel, int num_bins, std::vector<float>& pdf, const std:
     {
         hist_total += histogram[i];
     }
+    if(hist_total == 0) hist_total = 1; //avoids / 0, in case data is min==max
     //normalize
     for(int i = 0; i < num_bins; i++)
     {
@@ -133,10 +137,13 @@ void img::calcCDF(int channel, int num_bins, std::vector<float>& cdf, const std:
             cdf[j] += pdf[i];
         }
     }
+    std::cout << cdf[num_bins] << '\n';
 }
 
 void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
 {
+    if(num_bins == 0) return;
+
     out.clear(in.nx(), in.ny(), in.depth());
 
     std::vector< std::vector<float> > e_mmws(in.depth());
@@ -146,7 +153,7 @@ void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
 
     std::vector<float> e_mmw(3);
     std::vector<float> histogram(num_bins, 0);
-    std::vector<float> pdf(num_bins,0);
+    std::vector<float> pdf(num_bins, 0);
     std::vector<float> cdf(num_bins+1, 0);
     for(int k = 0; k < in.depth(); k++)
     {
@@ -179,10 +186,19 @@ void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
                 if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; // so OpenGL doesnt erase image b/c of alpha
                 else
                 {
-                    int bin_i = int((in.raw()[index(i, j, c, in.depth(), in.nx())] - e_mmws[c][0]) / e_mmws[c][2]);
-                    //allow bin_numBins, cdf[numBins] = 1 so the image shows the max value: 1
-                    if(bin_i >= 0 && bin_i <= num_bins) 
-                        out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][bin_i];
+                    //max value maps to cdf_(num_bins), which always equals 1
+                    //this ensures max value is displayed in image, max values < 1 will be slightly rounded up b/c of this
+                    if(in.raw()[index(i, j, c, in.depth(), in.nx())] == e_mmws[c][1])
+                    {
+                        out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][num_bins];
+                    }
+                    //non-max values map to cdf_(bin_i)
+                    else
+                    {
+                        int bin_i = int((in.raw()[index(i, j, c, in.depth(), in.nx())] - e_mmws[c][0]) / e_mmws[c][2]);
+                        if(bin_i >= 0 && bin_i < num_bins) 
+                            out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][bin_i];
+                    }
                 }
             }
         }
