@@ -116,6 +116,7 @@ class StarterViewer
     float current_raster_pos[4];
     
     img::ImgProc* imgProc;
+    img::ImgProc old_imgProc;
     std::string fileName;
 
     GLuint textureID;

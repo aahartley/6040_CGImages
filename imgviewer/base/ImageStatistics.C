@@ -10,7 +10,7 @@ float img::calcChannelAvg(int channel, const ImgProc& in)
     {
         for(int i = 0; i < in.nx(); i++)
         {
-            avgColorA += in.raw()[index(i, j, channel, in.depth(), in.nx())];
+            avgColorA += in.raw()[in.index(i, j, channel)];
         }
     }
     avgColorA /= in.nx() * in.ny();
@@ -25,8 +25,8 @@ float img::calcCovariance(int channelA, int channelB, std::vector<float>& avgs, 
     {
         for(int i = 0; i < in.nx(); i++)
         {
-            float fluctA = in.raw()[index(i, j, channelA, in.depth(), in.nx())] - avgs[channelA];
-            float fluctB = in.raw()[index(i, j, channelB, in.depth(), in.nx())] - avgs[channelB];
+            float fluctA = in.raw()[in.index(i, j, channelA)] - avgs[channelA];
+            float fluctB = in.raw()[in.index(i, j, channelB)] - avgs[channelB];
 
             covariance += fluctA * fluctB;
         }
@@ -58,9 +58,9 @@ void img::ContrastUnits(const ImgProc& in, ImgProc& out)
         {
             for(int c = 0; c < in.depth(); c++)
             {
-                if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; //so OpenGL alpha channel doesnt stop img from being seen
+                if(c == 3) out.raw()[in.index(i, j, c)] = 1; //so OpenGL alpha channel doesnt stop img from being seen
                 else
-                    out.raw()[index(i, j, c, in.depth(), in.nx())] = (in.raw()[index(i, j, c, in.depth(), in.nx())] - channelAvgs[c]) / std::sqrt(covariances[c]);
+                    out.raw()[in.index(i, j, c)] = (in.raw()[in.index(i, j, c)] - channelAvgs[c]) / std::sqrt(covariances[c]);
             }
         }
     }
@@ -73,18 +73,18 @@ void img::ContrastUnits(const ImgProc& in, ImgProc& out)
 void img::calcMinMaxWidth(int channel, int num_bins, std::vector<float>& e_mmw, const ImgProc& in)
 {
     //min
-    e_mmw[0] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
+    e_mmw[0] = in.raw()[in.index(0, 0, channel)];
     //max
-    e_mmw[1] = in.raw()[index(0, 0, channel, in.depth(), in.nx())];
+    e_mmw[1] = in.raw()[in.index(0, 0, channel)];
     for(int j = 0; j < in.ny(); j++)
     {
         for(int i = 0; i < in.nx(); i++)
         {
-            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] < e_mmw[0]) 
-                e_mmw[0] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
+            if(in.raw()[in.index(i, j, channel)] < e_mmw[0]) 
+                e_mmw[0] = in.raw()[in.index(i, j, channel)];
 
-            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] > e_mmw[1])
-                 e_mmw[1] = in.raw()[index(i, j, channel, in.depth(), in.nx())];
+            if(in.raw()[in.index(i, j, channel)] > e_mmw[1])
+                 e_mmw[1] = in.raw()[in.index(i, j, channel)];
 
         }
     }
@@ -102,9 +102,9 @@ void img::calcHistogram(int channel, int num_bins, std::vector<float>& histogram
             //[0 - num_bins-1], bins are [0, 1), [1, 2), ...., [num_bins-1, num_bins)
             //i.e, max value does not go into last bin for this implementation, bin_i with max value = num_bins
             // bin_i is susceptible to floating point error, max value can round down to be num_bins-1
-            if(in.raw()[index(i, j, channel, in.depth(), in.nx())] != e_mmw[1])//avoid floating point error & / 0
+            if(in.raw()[in.index(i, j, channel)] != e_mmw[1])//avoid floating point error & / 0
             {
-                int bin_i = int((in.raw()[index(i, j, channel, in.depth(), in.nx())] - e_mmw[0]) / e_mmw[2]);
+                int bin_i = int((in.raw()[in.index(i, j, channel)] - e_mmw[0]) / e_mmw[2]);
                 if(bin_i >= 0 && bin_i < num_bins){ histogram[bin_i] += 1;}
             }
         }
@@ -137,7 +137,6 @@ void img::calcCDF(int channel, int num_bins, std::vector<float>& cdf, const std:
             cdf[j] += pdf[i];
         }
     }
-    std::cout << cdf[num_bins] << '\n';
 }
 
 void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
@@ -183,21 +182,21 @@ void img::HistogramEqualization(const ImgProc& in, ImgProc& out, int num_bins)
         {
             for(int c = 0; c < in.depth(); c++)
             {
-                if(c == 3) out.raw()[index(i, j, c, in.depth(), in.nx())] = 1; // so OpenGL doesnt erase image b/c of alpha
+                if(c == 3) out.raw()[in.index(i, j, c)] = 1; // so OpenGL doesnt erase image b/c of alpha
                 else
                 {
                     //max value maps to cdf_(num_bins), which always equals 1
                     //this ensures max value is displayed in image, max values < 1 will be slightly rounded up b/c of this
-                    if(in.raw()[index(i, j, c, in.depth(), in.nx())] == e_mmws[c][1])
+                    if(in.raw()[in.index(i, j, c)] == e_mmws[c][1])
                     {
-                        out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][num_bins];
+                        out.raw()[in.index(i, j, c)] = cdfs[c][num_bins];
                     }
                     //non-max values map to cdf_(bin_i)
                     else
                     {
-                        int bin_i = int((in.raw()[index(i, j, c, in.depth(), in.nx())] - e_mmws[c][0]) / e_mmws[c][2]);
+                        int bin_i = int((in.raw()[in.index(i, j, c)] - e_mmws[c][0]) / e_mmws[c][2]);
                         if(bin_i >= 0 && bin_i < num_bins) 
-                            out.raw()[index(i, j, c, in.depth(), in.nx())] = cdfs[c][bin_i];
+                            out.raw()[in.index(i, j, c)] = cdfs[c][bin_i];
                     }
                 }
             }

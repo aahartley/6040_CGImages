@@ -79,9 +79,9 @@ void ColorLUT::operator()(const double& value, std::vector<float>& C) const
 
 JuliaSet::JuliaSet(const Point& P0, const int nb, const int cycle)
 {
-    this->c = P0;
-    this->nb_iterations = nb;
-    this->cycles = cycle;
+    c = P0;
+    nb_iterations = nb;
+    cycles = cycle;
 }
 
 Point JuliaSet::operator()(const Point& P) const

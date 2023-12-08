@@ -47,6 +47,9 @@ class ImgProc
     int read_image(const std::string& s);
 	void write_image(std::string fileName, char f) const;
 
+	long index(int i, int j, int c) const;
+	long indexNon(int i, int j, int c) const;
+
 	//Affine transformations
 	void Flip();
 	void Flip(const float* in);

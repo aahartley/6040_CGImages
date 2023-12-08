@@ -213,6 +213,7 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
       case 'J':
          if(imgProc != nullptr)
          {
+            old_imgProc = *imgProc;
             Point center(0.03811, 0.01329);
             double range = 1.0e-6;
             Point zc(0.8*cos(254.3 * 3.14159265/180.0), 0.8*sin(254.3 * 3.14159265/180.0));
@@ -222,27 +223,62 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
             ApplyFractalWarpLUT(center, range, julia, lut, *imgProc);     
          }
          break;
+      case 'B':
+         if(imgProc != nullptr)
+         {
+            old_imgProc = *imgProc;
+            Brightness(*imgProc, 1.1);
+         }
+         break;
+      case 'b':
+         if(imgProc != nullptr)
+         {
+            old_imgProc = *imgProc;
+            Bias(*imgProc, std::vector<float>{-0.1,-0.1,-0.1});
+         }
+         break;
+      case 'c':
+         if(imgProc != nullptr)
+         {
+            old_imgProc = *imgProc;
+            Compliment(*imgProc);
+         }
+         break;
+      case 'e':
+         if(imgProc != nullptr)
+         {
+            old_imgProc = *imgProc;
+            Grayscale(*imgProc);
+         }
+         break;
+      case 'q':
+         if(imgProc != nullptr)
+         {
+            old_imgProc = *imgProc;
+            Quantize(*imgProc, 5);
+         }
+         break;
       case 'g':
          if(imgProc != nullptr)
          {
-            ImgProc out;
-            Gamma(*imgProc, out, 0.9);
-            *imgProc = out;
+            old_imgProc = *imgProc;
+            Gamma(*imgProc, 0.9);
          }
          break;
       case 'G':
          if(imgProc != nullptr)
          {
-            ImgProc out;
-            Gamma(*imgProc, out, 1.111111);
-            *imgProc = out;
+            old_imgProc = *imgProc;
+            Gamma(*imgProc, 1.111111);
          }
          break;
       case 's':
          if(imgProc != nullptr)
          {
+            old_imgProc = *imgProc;
             ImgProc out;
-            Stencil stencil(5);
+            //Stencil stencil(5);
+            Stencil stencil = makeEmboss3x3Filter();
             BoundedLinearConvolution(stencil, *imgProc, out);
             *imgProc = out;
          }
@@ -250,17 +286,24 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
       case 'C':
          if(imgProc != nullptr)
          {
-            ImgProc out;
-            ContrastUnits(*imgProc, out);
-            *imgProc = out;
+            old_imgProc = *imgProc;
+            ContrastUnits(*imgProc);
          }
          break;
       case 'H':
          if(imgProc != nullptr)
          {
+            old_imgProc = *imgProc;
             ImgProc out;
             HistogramEqualization(*imgProc, out, 500);
             *imgProc = out;
+         }
+         break;
+      case 'z':
+         if(imgProc != nullptr)
+         {
+            *imgProc = old_imgProc;
+            //old_imgProc = *imgProc;
          }
          break;
       case 'r':
@@ -331,12 +374,24 @@ void StarterViewer::Usage()
    cout << "-           Zoom out image\n";
    cout << "j           Write image to JPEG/JPG\n";
    cout << "o           Write image to EXR\n";
-   cout << "s           Apply Bounded Linear Convolution\n";
+   cout << "z           Undo last change\n\n";
+
+
    cout << "g           Apply gamma (lightens)\n";
    cout << "G           Apply gamma (darkens)\n";
-   cout << "J           Draws the Mandelbrot Julia Set\n";
+   cout << "B           Apply Brightness\n";
+   cout << "b           Apply Bias\n";
+   cout << "c           Apply compliment\n";
+   cout << "e           Apply Grayscale\n";
+   cout << "q           Apply Quantize\n\n";
+
+   cout << "s           Apply Bounded Linear Convolution\n";
+   
+   cout << "J           Draws the Mandelbrot Julia Set\n\n";
+
    cout << "C           Convert to Contrast Units\n";
    cout << "H           Histogram Equalize\n";
+
 
    cout << "--------------------------------------------------------------\n";
 }

@@ -49,7 +49,7 @@ void ImgProc::value( int i, int j, std::vector<float>& pixel) const
 	pixel.resize(Nc);
 	for(int c = 0; c < Nc; c++)
 	{
-		pixel[c] = img_data[index(i,j,c,Nc,Nx)];
+		pixel[c] = img_data[index(i,j,c)];
 	}
 	return;
 }
@@ -63,7 +63,7 @@ void ImgProc::set_value( int i, int j, const std::vector<float>& pixel)
 	//#pragma omp parallel for  //outer loops already in parallel
 	for( int c = 0; c < Nc; c++)
 	{
-		img_data[index(i,j,c,Nc,Nx)] = pixel[c];
+		img_data[index(i,j,c)] = pixel[c];
 	}
 	return;
 }
@@ -163,6 +163,16 @@ void ImgProc::write_image(std::string fileName, char f) const
 	delete [] pixels;
 }
 
+long ImgProc::index(int i , int j, int c) const
+{
+	 return c+(Nc*(i+Nx*j));
+
+}
+long ImgProc::indexNon(int i, int j, int c) const
+{ 
+	return i+(Nx*(j+(Ny*c)));
+}
+
 //flip in place
 void ImgProc::Flip()
 {
@@ -177,10 +187,10 @@ void ImgProc::Flip()
 		{				
 			for(int k = 0; k < Nc; k++)
 			{
-				float temp = img_data[index(i,j,k,Nc,Nx)];
+				float temp = img_data[index(i,j,k)];
 
-				img_data[index(i,j,k,Nc,Nx)] = img_data[index(i,Ny-1-j,k,Nc,Nx)];
-				img_data[index(i,Ny-1-j,k,Nc,Nx)]= temp;
+				img_data[index(i,j,k)] = img_data[index(i,Ny-1-j,k)];
+				img_data[index(i,Ny-1-j,k)]= temp;
 
 			}
 		}
@@ -200,7 +210,7 @@ void ImgProc::Flip(const float* data)
 		{
 			for(int k = 0; k < Nc; k++)
 			{
-				img_data[index(i,j,k,Nc,Nx)] = data[index(i,Ny-1-j,k,Nc,Nx)];
+				img_data[index(i,j,k)] = data[index(i,Ny-1-j,k)];
 			}
 		}
 
@@ -223,10 +233,10 @@ void ImgProc::Flop()
 		{				
 			for(int k = 0; k < Nc; k++)
 			{
-				float temp = img_data[index(i,j,k,Nc,Nx)];
+				float temp = img_data[index(i,j,k)];
 
-				img_data[index(i,j,k,Nc,Nx)] = img_data[index(Nx-1-i,j,k,Nc,Nx)];
-				img_data[index(Nx-1-i,j,k,Nc,Nx)]= temp;
+				img_data[index(i,j,k)] = img_data[index(Nx-1-i,j,k)];
+				img_data[index(Nx-1-i,j,k)]= temp;
 
 			}
 		}
@@ -355,10 +365,10 @@ void img::Flip(ImgProc& in)
 		{				
 			for(int k = 0; k < in.depth(); k++)
 			{
-				float temp = in.raw()[index(i,j,k,in.depth(),in.nx())];
+				float temp = in.raw()[in.index(i,j,k)];
 
-				in.raw()[index(i,j,k,in.depth(),in.nx())] = in.raw()[index(i,in.ny()-1-j,k,in.depth(),in.nx())];
-				in.raw()[index(i,in.ny()-1-j,k,in.depth(),in.nx())]= temp;
+				in.raw()[in.index(i,j,k)] = in.raw()[in.index(i,in.ny()-1-j,k)];
+				in.raw()[in.index(i,in.ny()-1-j,k)]= temp;
 
 			}
 		}
@@ -377,7 +387,7 @@ void img::Flip(const float* in, int nx, int ny, int nc, float* out, int Nx, int 
 			for(int k = 0; k < Nc; k++)
 			{
 				//flip in place
-				out[index(i,j,k,Nc,Nx)] = in[index(i,ny-1-j,k,nc,nx)];
+				out[Index(i,j,k,Nc,Nx)] = in[Index(i,ny-1-j,k,nc,nx)];
 			}
 		}
 	}
@@ -396,10 +406,10 @@ void img::Flop(ImgProc& in)
 		{				
 			for(int k = 0; k <in.depth(); k++)
 			{
-				float temp = in.raw()[index(i,j,k,in.depth(),in.nx())];
+				float temp = in.raw()[in.index(i,j,k)];
 
-				in.raw()[index(i,j,k,in.depth(),in.nx())] = in.raw()[index(in.nx()-1-i,j,k,in.depth(),in.nx())];
-				in.raw()[index(in.nx()-1-i,j,k,in.depth(),in.nx())]= temp;
+				in.raw()[in.index(i,j,k)] = in.raw()[in.index(in.nx()-1-i,j,k)];
+				in.raw()[in.index(in.nx()-1-i,j,k)]= temp;
 
 			}
 		}

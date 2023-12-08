@@ -45,7 +45,7 @@ base: $(OFILES)
 	$(CXX) base/Main.C $(INCLUDES)  -L./lib  -lstarter $(GLLDFLAGS)  -L ../build/lib -lOpenImageIO -lOpenImageIO_Util -o bin/imgviewer
 
 clean:
-	rm -rf bin/simple_viewer doc/html *.o base/*.o base/*~ include/*~ python/*~ $(LIB)  *~ swig/*.cxx swig/*~ swig/*.so swig/*.o swig/StarterViewer.py swig/*.pyc ./*.pyc python/*StarterViewer*
+	rm -rf bin/imgviewer doc/html *.o base/*.o base/*~ include/*~ python/*~ $(LIB)  *~ swig/*.cxx swig/*~ swig/*.so swig/*.o swig/StarterViewer.py swig/*.pyc ./*.pyc python/*StarterViewer*
 
 .PHONY: doc
 doc:
