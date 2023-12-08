@@ -287,7 +287,9 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
          if(imgProc != nullptr)
          {
             old_imgProc = *imgProc;
-            ContrastUnits(*imgProc);
+            ImgProc out;
+            ContrastUnits(*imgProc, out);
+            *imgProc = out;
          }
          break;
       case 'H':
@@ -303,7 +305,6 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
          if(imgProc != nullptr)
          {
             *imgProc = old_imgProc;
-            //old_imgProc = *imgProc;
          }
          break;
       case 'r':
