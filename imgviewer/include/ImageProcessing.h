@@ -33,6 +33,7 @@ class Stencil
     int half_width;
     float* stencil_values;
 };
+// test stencils
 Stencil makeSharpen3x3Filter();
 Stencil makeEdgeDetect3x3Filter();
 Stencil makeEmboss3x3Filter();
@@ -53,7 +54,7 @@ void Compliment(ImgProc& out);
 void Grayscale(const ImgProc& in, ImgProc& out);
 void Grayscale(ImgProc& out);
 void Quantize(const ImgProc& in, ImgProc& out, int levels);
-void Quantize(ImgProc& out, int levels);
+void Quantize(ImgProc& out, float levels);
 }
 
 

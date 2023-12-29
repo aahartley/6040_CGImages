@@ -320,7 +320,7 @@ void img::Quantize(const ImgProc& in, ImgProc& out, int levels)
  		}
  	}
 }
-void img::Quantize(ImgProc& out, int levels)
+void img::Quantize(ImgProc& out, float levels)
 {
 	for(int j = 0; j < out.ny(); j++)
  	{

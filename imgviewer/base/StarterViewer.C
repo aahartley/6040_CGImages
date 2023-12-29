@@ -255,7 +255,7 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
          if(imgProc != nullptr)
          {
             old_imgProc = *imgProc;
-            Quantize(*imgProc, 5);
+            Quantize(*imgProc, 3.4);
          }
          break;
       case 'g':
@@ -277,8 +277,8 @@ void StarterViewer::Keyboard( unsigned char key, int x, int y )
          {
             old_imgProc = *imgProc;
             ImgProc out;
-            //Stencil stencil(5);
-            Stencil stencil = makeEmboss3x3Filter();
+            Stencil stencil(5);
+            //Stencil stencil = makeSharpen3x3Filter();
             BoundedLinearConvolution(stencil, *imgProc, out);
             *imgProc = out;
          }
